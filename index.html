@@ -145,25 +145,14 @@
       var rawpage = document.getElementById("u6_div");
       var eopage = document.getElementById("u9_div");
 
-      var timer;
-      raw.onmousedown = function () {
-          timer = setTimeout(function () {
-            raw.select();
-            document.execCommand("Copy");
-          }, 1250);
-      }
-      eo.onmousedown = function () {
-          timer = setTimeout(function () {
-            eo.select();
-            document.execCommand("Copy");
-          }, 1250);
+      raw.onfocus=function () {
+        raw.select();
+        document.execCommand("Copy");
       }
 
-      raw.onmouseup = function () {
-          clearTimeout(timer);
-      }
-      eo.onmouseup = function () {
-          clearTimeout(timer);
+      eo.onfocus=function () {
+        eo.select();
+        document.execCommand("Copy");
       }
 
       raw.onblur=function(){

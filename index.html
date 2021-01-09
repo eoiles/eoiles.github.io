@@ -95,7 +95,7 @@
 
             <!-- Unnamed (Rectangle) -->
             <div id="u6" class="ax_default box_1">
-              <div id="u6_div" class="" onclick="rawpageclick()" ontouch="rawpageclick()"></div>
+              <div id="u6_div" class=""></div>
               <div id="u6_text" class="text " style="display:none; visibility: hidden">
                 <p></p>
               </div>
@@ -117,7 +117,7 @@
 
             <!-- Unnamed (Rectangle) -->
             <div id="u9" class="ax_default box_1">
-              <div id="u9_div" class="" onclick="eopageclick()" ontouch="eopageclick()"></div>
+              <div id="u9_div" class=""></div>
               <div id="u9_text" class="text " style="display:none; visibility: hidden">
                 <p></p>
               </div>
@@ -155,13 +155,13 @@
         timer = setTimeout(function () {
           raw.select();
           document.execCommand("Copy");
-        }, 1500);
+        }, 2000);
     }
     eo.onmousedown = function () {
         timer = setTimeout(function () {
           eo.select();
           document.execCommand("Copy");
-        }, 1500);
+        }, 2000);
     }
 
 
@@ -174,16 +174,15 @@
 
 
 
-    function rawpageclick(){
 
-      eo.value=enc(raw.value);
-    }
 
-    function eopageclick(){
-
+    eo.onblur=function(){
       raw.value=dec(eo.value);
+    };
+    raw.onblur=function(){
+      eo.value=dec(raw.value);
+    };
 
-    }
 
     window.onkeydown=function(){
 
@@ -245,6 +244,7 @@
       return res
 
     }
+
 
 
 

@@ -107,7 +107,7 @@
               <!-- Unnamed (Text Area) -->
               <div id="u8" class="ax_default text_area">
                 <div id="u8_div" class=""></div>
-                <textarea id="u8_input" class="u8_input"></textarea>
+                <textarea id="u8_input" class="u8_input" placeholder="eoiles"></textarea>
               </div>
             </div>
           </div>
@@ -129,7 +129,7 @@
               <!-- Unnamed (Text Area) -->
               <div id="u11" class="ax_default text_area">
                 <div id="u11_div" class=""></div>
-                <textarea id="u11_input" class="u11_input"></textarea>
+                <textarea id="u11_input" class="u11_input" placeholder="⠀⡥⠀⡯⠀⡩⠀⡬⠀⡥⠀⡳"></textarea>
               </div>
             </div>
           </div>
@@ -166,11 +166,17 @@
           clearTimeout(timer);
       }
 
-      eo.onblur=function(){
-        raw.value=dec(eo.value);
-      };
       raw.onblur=function(){
         eo.value=enc(raw.value);
+        if(raw.value.charCodeAt()>=10240 && raw.value.charCodeAt()<=(10240+256)){
+          alert("encode again , continue?")
+        };
+      };
+      eo.onblur=function(){
+        raw.value=dec(eo.value);
+        if(eo.value.charCodeAt()<10240 || eo.value.charCodeAt()>(10240+256)){
+          alert("can't decode wrong code , continue?")
+        };
       };
 
       window.onkeydown=function(){

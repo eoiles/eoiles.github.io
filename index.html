@@ -117,7 +117,7 @@
 
             <!-- Unnamed (Rectangle) -->
             <div id="u9" class="ax_default box_1">
-              <div id="u9_div" class="" onclick="eopageclick"></div>
+              <div id="u9_div" class="" onclick="eopageclick()"></div>
               <div id="u9_text" class="text " style="display:none; visibility: hidden">
                 <p></p>
               </div>
@@ -174,35 +174,19 @@
 
 
 
-    function synchronize() {
-      if (document.activeElement==raw) {
-
-        eo.value=enc(raw.value);
-
-      }
-      else if(document.activeElement==eo){
-
-        raw.value=dec(eo.value);
-
-      }
-      else {
-      }
-
-    }
-
-
     function rawpageclick(){
 
-      synchronize();
+      eo.value=enc(raw.value);
     }
 
-    function rawpageclick(){
+    function eopageclick(){
 
-      synchronize();
+      raw.value=dec(eo.value);
+
     }
 
     window.onkeydown=function(){
-      synchronize();
+
 
       if(13 == event.keyCode && document.activeElement==raw){
         rawpage.click();

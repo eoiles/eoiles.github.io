@@ -140,115 +140,116 @@
 
 
 
-
     <script type="text/javascript">
 
-    var raw = document.getElementById("u8_input");
-    var eo = document.getElementById("u11_input");
+      var raw = document.getElementById("u8_input");
+      var eo = document.getElementById("u11_input");
 
-    var rawpage = document.getElementById("u6_div");
-    var eopage = document.getElementById("u9_div");
-
-
-    var timer;
-    raw.onmousedown = function () {
-        timer = setTimeout(function () {
-          raw.select();
-          document.execCommand("Copy");
-        }, 2000);
-    }
-    eo.onmousedown = function () {
-        timer = setTimeout(function () {
-          eo.select();
-          document.execCommand("Copy");
-        }, 2000);
-    }
+      var rawpage = document.getElementById("u6_div");
+      var eopage = document.getElementById("u9_div");
 
 
-    raw.onmouseup = function () {
-        clearTimeout(timer);
-    }
-    eo.onmouseup = function () {
-        clearTimeout(timer);
-    }
-
-
-
-
-
-    eo.onblur=function(){
-      raw.value=dec(eo.value);
-    };
-    raw.onblur=function(){
-      eo.value=dec(raw.value);
-    };
-
-
-    window.onkeydown=function(){
-
-
-      if(13 == event.keyCode && document.activeElement==raw){
-        rawpage.click();
-
+      var timer;
+      raw.onmousedown = function () {
+          timer = setTimeout(function () {
+            raw.select();
+            document.execCommand("Copy");
+          }, 1500);
       }
-      else if (13 == event.keyCode && document.activeElement==eo) {
-        eopage.click();}}
-
-    function qr(unicode){
-
-      return Array(parseInt(unicode/256)+10240,unicode%256+10240)
-    }
-
-    function qri(array){
-      return (array[0]-10240)*256+(array[1]-10240)
-    }
-
-    function enc(rawstr){
-      res=Array();
-
-      for (var i = 0; i < rawstr.length; i++) {
-        res.push(rawstr.charCodeAt(i));
+      eo.onmousedown = function () {
+          timer = setTimeout(function () {
+            eo.select();
+            document.execCommand("Copy");
+          }, 1500);
       }
 
-      res=res.map(qr).flat(Infinity);
 
-      for (var i = 0; i < res.length; i++) {
-        res[i]=String.fromCharCode(res[i]);
+      raw.onmouseup = function () {
+          clearTimeout(timer);
+      }
+      eo.onmouseup = function () {
+          clearTimeout(timer);
       }
 
-      res=res.join("")
 
-      return res
 
-    }
 
-    function dec(eostr){
-      rawres=Array();
-      for (var i = 0; i < eostr.length; i++) {
-        rawres.push(eostr.charCodeAt(i));
+      eo.onblur=function(){
+        raw.value=dec(eo.value);
+      };
+      raw.onblur=function(){
+        eo.value=enc(raw.value);
+      };
+
+
+
+      window.onkeydown=function(){
+
+
+        if(13 == event.keyCode && document.activeElement==raw){
+          rawpage.click();
+
+        }
+        else if (13 == event.keyCode && document.activeElement==eo) {
+          eopage.click();}}
+
+      function qr(unicode){
+
+        return Array(parseInt(unicode/256)+10240,unicode%256+10240)
       }
 
-      res=Array();
-      for (var i = 0; i < rawres.length; i += 2) {
-        res.push(rawres.slice(i, i + 2));
+      function qri(array){
+        return (array[0]-10240)*256+(array[1]-10240)
       }
 
-      res=res.map(qri)
+      function enc(rawstr){
+        res=Array();
 
-      for (var i = 0; i < res.length; i++) {
-        res[i]=String.fromCharCode(res[i]);
+        for (var i = 0; i < rawstr.length; i++) {
+          res.push(rawstr.charCodeAt(i));
+        }
+
+        res=res.map(qr).flat(Infinity);
+
+        for (var i = 0; i < res.length; i++) {
+          res[i]=String.fromCharCode(res[i]);
+        }
+
+        res=res.join("")
+
+        return res
+
       }
 
-      res=res.join("")
+      function dec(eostr){
+        rawres=Array();
+        for (var i = 0; i < eostr.length; i++) {
+          rawres.push(eostr.charCodeAt(i));
+        }
 
-      return res
+        res=Array();
+        for (var i = 0; i < rawres.length; i += 2) {
+          res.push(rawres.slice(i, i + 2));
+        }
 
-    }
+        res=res.map(qri)
+
+        for (var i = 0; i < res.length; i++) {
+          res[i]=String.fromCharCode(res[i]);
+        }
+
+        res=res.join("")
+
+        return res
+
+      }
 
 
 
 
-    </script>
+      </script>
+
+
 
 
 

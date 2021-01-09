@@ -74,6 +74,10 @@
 }
 .arrow {
 }
+.text_area {
+  color:#000000;
+  text-align:left;
+}
 .droplist {
   color:#000000;
   text-align:left;
@@ -88,6 +92,8 @@
 .form_disabled {
 }
 .icon {
+}
+.flow_shape {
 }
 .image {
 }

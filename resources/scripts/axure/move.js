@@ -127,15 +127,15 @@
             if(animationCompleteCallback) animationCompleteCallback();
             if(shouldFire) $ax.action.fireAnimationFromQueue(id, $ax.action.queueTypes.move);
         };
-        if(options.easing==='none') {
-            query.animate(cssStyles, {
-                duration: 0,
-                queue: false,
-                complete: function() { //this animation somehow is not fired without this complete function
-                    if(rootLayer) $ax.visibility.popContainer(rootLayer, false);
-                    if(animationCompleteCallback) animationCompleteCallback();
-                }
-            });
+        if (options.easing === 'none') {
+            //if not having this requestAnimationFrame causes performance issues,
+            //add it back and move the above call to moveMovedLocation into it and the
+            //query.animate calls below
+            //window.requestAnimationFrame(function () {
+                query.css(cssStyles);
+                if (rootLayer) $ax.visibility.popContainer(rootLayer, false);
+                if (animationCompleteCallback) animationCompleteCallback();
+            //});
             //if this widget is inside a layer, we should just remove the layer from the queue
             if(shouldFire) $ax.action.fireAnimationFromQueue(id, $ax.action.queueTypes.move);
         } else if (options.trajectory === 'straight' || moveInfo.horzX === 0 || moveInfo.vertY === 0) {

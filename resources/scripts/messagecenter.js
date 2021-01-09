@@ -82,22 +82,23 @@ var BROWSER_VERSION = 5000;
     IE = IE_10_AND_BELOW || IE_11_AND_ABOVE;
 
     var _supports = $axure.mobileSupport = {};
-    _supports.touchstart = typeof window.ontouchstart !== 'undefined';
-    _supports.touchmove = typeof window.ontouchmove !== 'undefined';
-    _supports.touchend = typeof window.ontouchend !== 'undefined';
-    _supports.mobile = _supports.touchstart && _supports.touchend && _supports.touchmove;
 
-    if (!MOBILE_DEVICE && _supports.mobile) {
-        _supports.touchstart = false;
-        _supports.touchmove = false;
-        _supports.touchend = false;
-        _supports.mobile = false;
+    if(MOBILE_DEVICE || navigator.maxTouchPoints || navigator.msMaxTouchPoints) {
+        _supports.touchstart = typeof window.ontouchstart !== 'undefined';
+        _supports.touchmove = typeof window.ontouchmove !== 'undefined';
+        _supports.touchend = typeof window.ontouchend !== 'undefined';
+
+        _supports.pointerdown = typeof window.onpointerdown !== 'undefined';
+        _supports.pointerup = typeof window.onpointerup !== 'undefined';
+        _supports.pointermove = typeof window.onpointermove !== 'undefined';
     }
 
+    _supports.mobile = _supports.touchstart && _supports.touchend && _supports.touchmove;
+    
     var _eventNames = $axure.eventNames = {};
-    _eventNames.mouseDownName = _supports.touchstart ? 'touchstart' : 'mousedown';
-    _eventNames.mouseUpName = _supports.touchend ? 'touchend' : 'mouseup';
-    _eventNames.mouseMoveName = _supports.touchmove ? 'touchmove' : 'mousemove';
+    _eventNames.mouseDownName = _supports.touchstart ? 'touchstart' : _supports.pointerdown ? 'pointerdown' : 'mousedown';
+    _eventNames.mouseUpName = _supports.touchend ? 'touchend' : _supports.pointerup ? 'pointerup' : 'mouseup';
+    _eventNames.mouseMoveName = _supports.touchmove ? 'touchmove' : _supports.pointermove ? 'pointermove' : 'mousemove';
 
     //Used by sitemap and variables.js getLinkUrl functions so that they know
     //whether to embed global variables in URL as query string or hash string

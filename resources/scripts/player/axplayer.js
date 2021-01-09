@@ -8,15 +8,10 @@ var CLOUD_VAR_NAME = 'cl';
 var TRACE_VAR_NAME = 'tr';
 var RP_VERSION = 9;
 var lastLeftPanelWidth = 220;
-var lastRightPanelWidth = 220;
+var lastRightPanelWidth = 290;
 var lastLeftPanelWidthDefault = 220;
-var lastRightPanelWidthDefault = 220;
+var lastRightPanelWidthDefault = 290;
 var toolBarOnly = true;
-// TODO: need to find a way to get rid of iphone X hacks!!!
-// - could possibly have app detect iphone and send information back to player, but currently, that information would arrive too late
-var iphoneX = false;
-var iphoneXFirstPass = true;
-
 
 // isolate scope
 (function () {
@@ -38,7 +33,6 @@ var iphoneXFirstPass = true;
     var isCloud = $axure.player.isCloud = getHashStringVar(CLOUD_VAR_NAME);
     if (isCloud) {
         $("#topPanel").css('display', 'none');
-        lastRightPanelWidthDefault = 290;
     }else {
         $("#topPanel").css('display', '');
     }
@@ -118,7 +112,11 @@ var iphoneXFirstPass = true;
             window.location = 'resources/chrome/firefox.html';
         }
     });
-
+    
+    $(window).on('hashchange', function() {
+        window.location.reload();
+    });
+    
     function appendOutOfDateNotification() {
         var toAppend = '';
         toAppend += '<div id="browserOutOfDateNotification">';
@@ -260,7 +258,6 @@ var iphoneXFirstPass = true;
             // IOS often does not complete updating innerHeight and innerWidth
             // until after calling orientation changed and resized window
             // Also, cannot use $(window).height() call since iOS11 needs padding amount
-            iphoneXFirstPass = false
             if (IOS && isMobileMode()) setTimeout(function () { $axure.player.resizeContent(true); }, 250);
         });
 
@@ -494,20 +491,10 @@ var iphoneXFirstPass = true;
 
         var newHeight = 0;
         var newWidth = 0;
-        if (iphoneX && $axure.utils.isShareApp()) {
+        if (IOS && $axure.utils.isShareApp()) {
             // Hack for Iphone X
-            newHeight = $(window).height() - ((!isMobile && $('#topPanel').is(':visible')) ? $('#topPanel').height() : 0);
+            newHeight = iosInnerHeight();
             newWidth = $(window).width();
-            // This does not need to make sense, since it is Iphone X
-            var notchAndHomeOffsetPortrait = iphoneXFirstPass ? 35 : 5;
-            var notchOffsetLandscape = iphoneXFirstPass ? 45 : 10;
-            var homeButtonOffsetLandscape = iphoneXFirstPass ? 21 : 10;
-            if (newHeight > newWidth) {
-                newHeight = newHeight + notchAndHomeOffsetPortrait;
-            } else {
-                newWidth = newWidth + notchOffsetLandscape * 2;
-                newHeight = newHeight + homeButtonOffsetLandscape;
-            }
         } else {
             // innerHeight includes padding for window -- needed in iOS 11 to have prototype stretch to bottom of screen (could put in -- if (iOS) -- block if needed)
             //var newHeight = $(window).height() - ((!isMobile && $('#topPanel').is(':visible'))? $('#topPanel').height() : 0);
@@ -1137,6 +1124,62 @@ var iphoneXFirstPass = true;
         return liveSafari || SAFARI || (IOS && $axure.utils.isShareApp());
     };
 
+    var iosInnerHeight = (function () {
+        if (!navigator.userAgent.match(/iphone|ipod|ipad/i)) {
+            /**
+             * Avoids conditional logic in the implementation
+             * @return {number} - window's innerHeight measurement in pixels
+             */
+            return function () {
+                return window.innerHeight;
+            };
+        }
+
+        // Store initial orientation
+        var axis = Math.abs(window.orientation);
+        // And hoist cached dimensions
+        var dims = { w: 0, h: 0 };
+
+        /**
+         * Creates an element with a height of 100vh since iOS accurately
+         * reports vp height (but not window.innerHeight). Then destroy it.
+         */
+        var createRuler = function () {
+            var ruler = document.createElement('div');
+
+            ruler.style.position = 'fixed';
+            ruler.style.height = '100vh';
+            ruler.style.width = 0;
+            ruler.style.top = 0;
+
+            document.documentElement.appendChild(ruler);
+
+            // Set cache conscientious of device orientation
+            dims.w = axis === 90 ? ruler.offsetHeight : window.innerWidth;
+            dims.h = axis === 90 ? window.innerWidth : ruler.offsetHeight;
+
+            // Clean up after ourselves
+            document.documentElement.removeChild(ruler);
+            ruler = null;
+        };
+
+        // Measure once
+        createRuler();
+
+        /**
+         * Returns window's cached innerHeight measurement
+         * based on viewport height and device orientation
+         * @return {number} - window's innerHeight measurement in pixels
+         */
+        return function () {
+            if (Math.abs(window.orientation) !== 90) {
+                return dims.h;
+            }
+
+            return dims.w;
+        };
+    }());
+
     function includeTokens(ajaxData, excludeUser) {
         //If the authCookieValue is set (a password-protected local prototype), then send the
         //token as well (because cookies don't always get sent to external domains)
@@ -1148,6 +1191,14 @@ var iphoneXFirstPass = true;
         }
     }
 
+    function getUserName(name) {
+        try {
+            return decodeURIComponent(name);
+        } catch {
+            return name;
+        }
+    }
+
     function setUserLoggedInStatus(response, safariAuthResponseProfile) {
         if (!response.success) {
             userAcct.isUsingAxureAcct = false;
@@ -1155,9 +1206,9 @@ var iphoneXFirstPass = true;
             if (safariAuthResponseProfile) response = safariAuthResponseProfile;
             userAcct.userId = response.userId;
             if (safariAuthResponseProfile) 
-                userAcct.userName = response.username == null || response.username.trim() === '' ? response.userEmail : decodeURIComponent(response.username.trim());
+                userAcct.userName = response.username == null || response.username.trim() === '' ? response.userEmail : getUserName(response.username.trim());
             else
-                userAcct.userName = response.nickname == null || response.nickname.trim() === '' ? response.userEmail : decodeURIComponent(response.nickname.trim());
+                userAcct.userName = response.nickname == null || response.nickname.trim() === '' ? response.userEmail : getUserName(response.nickname.trim());
             userAcct.userEmail = response.userEmail;
             userAcct.userProfileImg = response.profileImageUrl;
             userAcct.isUsingAxureAcct = true;
@@ -1535,22 +1586,10 @@ var iphoneXFirstPass = true;
                     // Could stop automatic scaling on Ipads as well that we actually want, but for now, seems fine
                     $('body').css('-webkit-text-size-adjust', '100%');
 
-                    // Prepare for Iphone X hacks
-                    // Link for dimensions: https://kapeli.com/cheat_sheets/iOS_Design.docset/Contents/Resources/Documents/index
-                    var ratio = window.devicePixelRatio || 1;
-                    // Regular iphoneX
-                    if (IOS && window.screen.width * ratio == 1125 && window.screen.height * ratio === 2436) {
-                        iphoneX = true;
-                    }
-                    // Iphone XS Max and Iphone XR
-                    if (IOS && window.screen.width == 414 && window.screen.height === 896) {
-                        iphoneX = true;
-                    }
-
                     window.addEventListener("orientationchange", function () {
                         var viewport = document.querySelector("meta[name=viewport]");
                         //so iOS doesn't zoom when switching back to portrait
-                        if (iphoneX) {
+                        if (IOS) {
                             viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover');
                             viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover');
                         } else {
@@ -1654,7 +1693,7 @@ var iphoneXFirstPass = true;
 
         $('#mobileControlFrameContainer').append(toAppend);
 
-        var barHeight = IOS ? (iphoneX ? '82px' : '72px') : '60px';
+        var barHeight = IOS ? '72px' : '60px';
         var returnIconDisplacement = IOS ? '-15px': '-20px';
         var iconTopMargin = IOS ? '14px': '7px';
         var returnTextTopMargin = IOS ? '9px': '7px';

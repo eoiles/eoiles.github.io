@@ -96,8 +96,8 @@
                 widgetDragInfo.cursorChanged = true;
                 widgetDragInfo.oldBodyCursor = window.document.body.style.cursor;
                 window.document.body.style.cursor = 'move';
-                widgetDragInfo.oldCursor = widget.style.cursor;
                 var widget = window.document.getElementById(widgetDragInfo.widgetId);
+                widgetDragInfo.oldCursor = widget.style.cursor;
                 widget.style.cursor = 'move';
                 //need to do this in order to change the cursor under nice scroll
                 var niceScrollContainer = $ax.adaptive.getNiceScrollContainer(widget);

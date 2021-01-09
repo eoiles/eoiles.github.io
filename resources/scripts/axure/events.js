@@ -3,13 +3,9 @@
 $axure.internal(function($ax) {
     var _features = $ax.features = {};
     var _supports = _features.supports = {};
-    _supports.touchstart = typeof window.ontouchstart !== 'undefined';
-    _supports.touchmove = typeof window.ontouchmove !== 'undefined';
-    _supports.touchend = typeof window.ontouchend !== 'undefined';
 
-    _supports.mobile = _supports.touchstart && _supports.touchend && _supports.touchmove;
     // Got this from http://stackoverflow.com/questions/11381673/javascript-solution-to-detect-mobile-browser
-    var check = navigator.userAgent.match(/Android/i)
+    let isMobile = navigator.userAgent.match(/Android/i)
         || navigator.userAgent.match(/webOS/i)
         || navigator.userAgent.match(/iPhone/i)
         || navigator.userAgent.match(/iPad/i)
@@ -18,19 +14,24 @@ $axure.internal(function($ax) {
         || navigator.userAgent.match(/Tablet PC/i)
         || navigator.userAgent.match(/Windows Phone/i);
 
-    _supports.windowsMobile = navigator.userAgent.match(/Tablet PC/i) || navigator.userAgent.match(/Windows Phone/i);
+    if(isMobile || navigator.maxTouchPoints || navigator.msMaxTouchPoints) {
+        _supports.touchstart = typeof window.ontouchstart !== 'undefined';
+        _supports.touchmove = typeof window.ontouchmove !== 'undefined';
+        _supports.touchend = typeof window.ontouchend !== 'undefined';
 
-    if(!check && _supports.mobile) {
-        _supports.touchstart = false;
-        _supports.touchmove = false;
-        _supports.touchend = false;
-        _supports.mobile = false;
+        _supports.pointerdown = typeof window.onpointerdown !== 'undefined';
+        _supports.pointerup = typeof window.onpointerup !== 'undefined';
+        _supports.pointermove = typeof window.onpointermove !== 'undefined';
     }
-
+    
+    _supports.mobile = _supports.touchstart && _supports.touchend && _supports.touchmove;
+                    // || _supports.pointerdown && _supports.pointerup && _supports.pointermove;
+    _supports.windowsMobile = navigator.userAgent.match(/Tablet PC/i) || navigator.userAgent.match(/Windows Phone/i);
+    
     var _eventNames = _features.eventNames = {};
-    _eventNames.mouseDownName = _supports.touchstart ? 'touchstart' : 'mousedown';
-    _eventNames.mouseUpName = _supports.touchend ? 'touchend' : 'mouseup';
-    _eventNames.mouseMoveName = _supports.touchmove ? 'touchmove' : 'mousemove';
+    _eventNames.mouseDownName = _supports.touchstart ? 'touchstart' : _supports.pointerdown ? 'pointerdown' : 'mousedown';
+    _eventNames.mouseUpName = _supports.touchend ? 'touchend' : _supports.pointerup ? 'pointerup' : 'mouseup';
+    _eventNames.mouseMoveName = _supports.touchmove ? 'touchmove' : _supports.pointermove ? 'pointermove' : 'mousemove';
 });
 
 // ******* EVENT MANAGER ******** //
@@ -711,6 +712,7 @@ $axure.internal(function ($ax) {
 
     // TODO: It may be a good idea to split this into multiple functions, or at least pull out more similar functions into private methods
     var _initializeObjectEvents = function(query, refreshType) {
+        var skipSelectedIds = new Set();
         query.each(function (dObj, elementId) {
             if (dObj == null) return;       // TODO: Update expo items that pass here to potentially remove this logic
             var $element = $jobj(elementId);
@@ -761,7 +763,13 @@ $axure.internal(function ($ax) {
                     if (dObj.disabled) $axElement.enabled(false);
 
                     // Initialize selected elements
-                    if(dObj.selected) $axElement.selected(true);
+                    // only set one member of selection group selected since subsequent calls
+                    // will unselect the previous one anyway
+                    if(dObj.selected && !skipSelectedIds.has(elementId)) {
+                        var group = $('#' + elementId).attr('selectiongroup');
+                        if(group) for(var item of $("[selectiongroup='" + group + "']")) skipSelectedIds.add(item.id);
+                        $axElement.selected(true);
+                    }
                 }
             } else if(refreshType == $ax.repeater.refreshType.preEval) {
                 // Otherwise everything should be set up correctly by pre-eval, want to set up selected disabled dictionaries (and disabled status)

@@ -232,7 +232,6 @@
                     var otherId = this.id;
                     if(otherId == id) return;
                     if ($ax.visibility.isScriptIdLimbo($ax.repeater.getScriptIdFromElementId(otherId))) return;
-
                     $ax.style.SetWidgetSelected(otherId, false, alwaysApply);
                 });
             }
@@ -243,8 +242,16 @@
             if ($ax.public.fn.IsDynamicPanel(obj.type) || $ax.public.fn.IsLayer(obj.type)) {
                 if(!value) $jobj(id).removeClass('selected');
                 var children = $axure('#' + id).getChildren()[0].children;
+                var skipIds = new Set();
                 for(var i = 0; i < children.length; i++) {
                     var childId = children[i];
+                    // only set one member of selection group in children selected since subsequent calls
+                    // will unselect the previous one anyway
+                    if(value) {
+                        if(skipIds.has(childId)) continue;
+                        var group = $('#' + childId).attr('selectiongroup');
+                        if(group) for (var item of $("[selectiongroup='" + group + "']")) skipIds.add(item.id);
+                    }
                     // Special case for trees
                     var childObj = $jobj(childId);
                     if(childObj.hasClass('treeroot')) {

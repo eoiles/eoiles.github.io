@@ -39,11 +39,11 @@ eo.onblur=function(){
 
 window.onkeydown=function(){
 
-  if(13 == event.keyCode && document.activeElement==raw){
+  if(event.ctrlKey && 13 == event.keyCode && document.activeElement==raw){
     rawpage.click();
 
   }
-  else if (13 == event.keyCode && document.activeElement==eo) {
+  else if (event.ctrlKey && 13 == event.keyCode && document.activeElement==eo) {
     eopage.click();}}
 
 function qr(unicode){

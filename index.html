@@ -74,7 +74,7 @@
 
               <!-- Unnamed (Rectangle) -->
               <div id="u4" class="ax_default flow_shape">
-                <div id="u4_div" class=""></div>
+                <div id="u4_div" class="" onclick="cleardefalut()"></div>
                 <div id="u4_text" class="text " style="display:none; visibility: hidden">
                   <p></p>
                 </div>
@@ -82,7 +82,7 @@
 
               <!-- Unnamed (Rectangle) -->
               <div id="u5" class="ax_default flow_shape">
-                <div id="u5_div" class=""></div>
+                <div id="u5_div" class="" onclick="cleardefalut()"></div>
                 <div id="u5_text" class="text " style="display:none; visibility: hidden">
                   <p></p>
                 </div>
@@ -107,7 +107,7 @@
               <!-- Unnamed (Text Area) -->
               <div id="u8" class="ax_default text_area">
                 <div id="u8_div" class=""></div>
-                <textarea id="u8_input" class="u8_input"></textarea>
+                <textarea id="u8_input" class="u8_input" placeholder="eoiles">eoiles</textarea>
               </div>
             </div>
           </div>
@@ -129,7 +129,7 @@
               <!-- Unnamed (Text Area) -->
               <div id="u11" class="ax_default text_area">
                 <div id="u11_div" class=""></div>
-                <textarea id="u11_input" class="u11_input"></textarea>
+                <textarea id="u11_input" class="u11_input" placeholder="⠀⡥⠀⡯⠀⡩⠀⡬⠀⡥⠀⡳">⠀⡥⠀⡯⠀⡩⠀⡬⠀⡥⠀⡳</textarea>
               </div>
             </div>
           </div>
@@ -150,13 +150,13 @@
           timer = setTimeout(function () {
             raw.select();
             document.execCommand("Copy");
-          }, 1250);
+          }, 1500);
       }
       eo.onmousedown = function () {
           timer = setTimeout(function () {
             eo.select();
             document.execCommand("Copy");
-          }, 1250);
+          }, 1500);
       }
 
       raw.onmouseup = function () {
@@ -235,6 +235,11 @@
         res=res.join("")
 
         return res
+      }
+
+      function cleardefalut(){
+        raw.value=""
+        eo.value=""
       }
 
       </script>

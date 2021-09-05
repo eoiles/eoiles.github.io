@@ -5,97 +5,71 @@ var eopage = document.getElementById("u9_div");
 
 var timer;
 raw.onmousedown = function () {
-    timer = setTimeout(function () {
-      raw.select();
-      document.execCommand("Copy");
-    }, 1500);
+  timer = setTimeout(function () {
+    raw.select();
+    document.execCommand("Copy");
+  }, 1500);
 }
 eo.onmousedown = function () {
-    timer = setTimeout(function () {
-      eo.select();
-      document.execCommand("Copy");
-    }, 1500);
+  timer = setTimeout(function () {
+    eo.select();
+    document.execCommand("Copy");
+  }, 1500);
 }
 
 raw.onmouseup = function () {
-    clearTimeout(timer);
+  clearTimeout(timer);
 }
 eo.onmouseup = function () {
-    clearTimeout(timer);
+  clearTimeout(timer);
 }
 
-raw.onblur=function(){
-  eo.value=enc(raw.value);
-  if(raw.value.charCodeAt()>=10240 && raw.value.charCodeAt()<=(10240+256)){
+raw.onblur = function () {
+  eo.value = enc(raw.value);
+  if (raw.value.charCodeAt() >= 10240 && raw.value.charCodeAt() <= (10240 + 256)) {
     alert("encode again , continue?")
   };
 };
-eo.onblur=function(){
-  raw.value=dec(eo.value);
-  if(eo.value.charCodeAt()<10240 || eo.value.charCodeAt()>(10240+256)){
+eo.onblur = function () {
+  raw.value = dec(eo.value);
+  if (eo.value.charCodeAt() < 10240 || eo.value.charCodeAt() > (10240 + 256)) {
     alert("can't decode wrong code , continue?")
   };
 };
 
-window.onkeydown=function(){
+window.onkeydown = function () {
 
-  if(event.ctrlKey && 13 == event.keyCode && document.activeElement==raw){
+  if (event.ctrlKey && 13 == event.keyCode && document.activeElement == raw) {
     rawpage.click();
 
   }
-  else if (event.ctrlKey && 13 == event.keyCode && document.activeElement==eo) {
-    eopage.click();}}
-
-function qr(unicode){
-
-  return Array(parseInt(unicode/256)+10240,unicode%256+10240)
+  else if (event.ctrlKey && 13 == event.keyCode && document.activeElement == eo) {
+    eopage.click();
+  }
 }
 
-function qri(array){
-  return (array[0]-10240)*256+(array[1]-10240)
-}
-
-function enc(rawstr){
-  res=Array();
-
-  for (var i = 0; i < rawstr.length; i++) {
-    res.push(rawstr.charCodeAt(i));
+function divlist(x, d) {
+  res = []
+  for (var i = 0; i < x.length; i += d) {
+    res.push(x.slice(i, i + d))
   }
-
-  res=res.map(qr).flat(Infinity);
-
-  for (var i = 0; i < res.length; i++) {
-    res[i]=String.fromCharCode(res[i]);
-  }
-
-  res=res.join("")
-
   return res
 }
 
-function dec(eostr){
-  rawres=Array();
-  for (var i = 0; i < eostr.length; i++) {
-    rawres.push(eostr.charCodeAt(i));
-  }
 
-  res=Array();
-  for (var i = 0; i < rawres.length; i += 2) {
-    res.push(rawres.slice(i, i + 2));
-  }
-
-  res=res.map(qri)
-
-  for (var i = 0; i < res.length; i++) {
-    res[i]=String.fromCharCode(res[i]);
-  }
-
-  res=res.join("")
-
+function remap(x, code) {
+  res = ""
+  Array.from(code).forEach(i => res += x[i])
   return res
 }
 
-function cleardefalut(){
-  raw.value=""
-  eo.value=""
+tobin = ((x, l) => ("0".repeat(l) + x.toString(2)).substr(-l))
+
+enc = (raw => Array.from(raw).map(x => divlist(tobin(x.charCodeAt(), 16), 8).map(y => String.fromCharCode(parseInt(remap(y, "73654210"), 2) + 10240)).join("")).join(""))
+
+dec = (raw => divlist(raw, 2).map(x => String.fromCharCode((y => y[0] * 256 + y[1])(divlist(x, 1).map(z => parseInt(remap(tobin(z.charCodeAt() - 10240, 8), "76514320"), 2))))).join(""))
+
+function cleardefalut() {
+  raw.value = ""
+  eo.value = ""
 }

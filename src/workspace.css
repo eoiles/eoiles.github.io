@@ -1,0 +1,693 @@
+/* 工作台：转换优先；原文与结果对照，三种结果呈现共用一个区域。 */
+:root {
+  --bg: #101213;
+  --panel: #16191b;
+  --surface: #111516;
+  --ink: #f0f2ef;
+  --muted: #a1aaa9;
+  --faint: #899593;
+  --line: #2c3335;
+  --accent: #b4eeeb;
+  --accent-ink: #112c2c;
+  --accent-wash: #203133;
+  --dot-off: #2b393a;
+}
+:root[data-theme="light"] {
+  --bg: #f0f1ee;
+  --panel: #fcfcf9;
+  --surface: #e9eeeb;
+  --ink: #202a2b;
+  --muted: #596966;
+  --faint: #64736e;
+  --line: #d7ddda;
+  --accent: #21655f;
+  --accent-ink: #fff;
+  --accent-wash: #e1eeea;
+  --dot-off: #bfcfc9;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f0f1ee;
+    --panel: #fcfcf9;
+    --surface: #e9eeeb;
+    --ink: #202a2b;
+    --muted: #596966;
+    --faint: #64736e;
+    --line: #d7ddda;
+    --accent: #21655f;
+    --accent-ink: #fff;
+    --accent-wash: #e1eeea;
+    --dot-off: #bfcfc9;
+  }
+}
+
+.shell {
+  max-width: 1120px;
+  padding: 0 40px;
+}
+.site-header {
+  height: 80px;
+  border-bottom: 1px solid var(--line);
+}
+.wordmark {
+  font-size: 28px;
+  font-weight: 500;
+  gap: 12px;
+}
+.brand-code {
+  opacity: 0.7;
+  letter-spacing: 3px;
+  font-size: 15px;
+}
+.header-end {
+  gap: 32px;
+}
+.intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 27px 0 23px;
+}
+h1 {
+  font-size: 24px;
+  line-height: 1.4;
+  font-weight: 450;
+  letter-spacing: -0.6px;
+}
+.convert-symbol {
+  font-size: 21px;
+  font-weight: 400;
+  color: var(--faint);
+  margin: 0 8px;
+}
+.intro-copy {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.workbench {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 16px 60px #0000000b;
+}
+.workspace {
+  min-width: 0;
+  padding: 0;
+}
+.editors {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: none !important;
+  overflow: visible;
+}
+.editor-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.editor-card:first-child {
+  border-right: 1px solid var(--line);
+  border-bottom: 0;
+}
+.card-heading {
+  min-height: 66px;
+  padding: 14px 24px 8px;
+  flex-shrink: 0;
+}
+.card-heading label {
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 450;
+}
+.button.compact {
+  min-height: 38px;
+  padding: 0 13px;
+  font-size: 12px;
+}
+.editor-card textarea {
+  padding: 14px 24px;
+  height: 242px;
+  min-height: 0;
+  max-height: none;
+  font-size: 18px;
+  line-height: 1.75;
+  resize: none;
+}
+.raw-card > textarea {
+  flex: 1;
+}
+.editor-card textarea::placeholder {
+  font-size: 16px;
+}
+.editor-meta {
+  min-height: 36px;
+  padding: 0 24px 12px;
+  font-size: 10px;
+}
+.workbar {
+  min-height: 50px;
+  padding: 0 16px 0 24px;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  margin-top: auto;
+}
+.work-actions {
+  gap: 1px;
+  flex-shrink: 0;
+}
+.work-actions .button {
+  padding: 0 8px;
+  min-height: 42px;
+  font-size: 11px;
+}
+.conversion-status {
+  font-size: 10px;
+  gap: 7px;
+}
+#status-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.code-card {
+  background: var(--surface);
+  border-radius: 0 14px 14px 0;
+}
+.visual-toolbar {
+  min-height: 50px;
+  padding: 0 24px 8px;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.segmented {
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.segmented button {
+  font-size: 11px;
+  min-width: 62px;
+  min-height: 32px;
+  padding: 0 10px;
+}
+#export-toggle {
+  min-height: 40px;
+  padding: 0 5px;
+  gap: 5px;
+  font-size: 11px;
+}
+#export-toggle .icon {
+  width: 14px;
+  height: 14px;
+}
+.result-body {
+  min-width: 0;
+  height: 242px;
+  flex-shrink: 0;
+  position: relative;
+}
+.result-pane {
+  height: 100%;
+  min-height: 0;
+}
+.code-card textarea {
+  height: 100%;
+  font-size: 23px;
+  letter-spacing: 2.5px;
+}
+.code-card textarea::placeholder {
+  font-size: 14px;
+}
+.visual-section {
+  margin: 0;
+  padding: 8px 24px 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  border: 0;
+}
+.preview-surface {
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+}
+.preview-scroll {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  display: block;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+#preview-empty {
+  height: 100%;
+  min-height: 0;
+  gap: 10px;
+  align-content: center;
+  font-size: 12px;
+  color: var(--faint);
+}
+.empty-mark {
+  display: grid;
+  grid-template-columns: repeat(2, 5px);
+  grid-template-rows: repeat(4, 5px);
+  gap: 5px;
+  margin: 0 auto;
+}
+.empty-mark i {
+  width: 5px;
+  height: 5px;
+  border: 1px solid var(--muted);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.empty-mark i:nth-child(3n) {
+  background: var(--accent);
+  border-color: var(--accent);
+  opacity: 0.8;
+}
+.preview-footer {
+  flex-shrink: 0;
+  min-height: 24px;
+  font-size: 10px;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+#preview-legend {
+  margin-left: 0;
+}
+#preview-count:not(:empty) + #preview-legend {
+  margin-left: auto;
+}
+.preview-warning {
+  margin-top: 0;
+  font-size: 11px;
+}
+.result-meta {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 24px;
+}
+.editor-card:has(textarea:placeholder-shown) .result-meta {
+  visibility: visible;
+}
+.code-card:has(textarea:placeholder-shown) #code-stats {
+  visibility: hidden;
+}
+#edit-code {
+  padding: 0;
+  font-size: 10px;
+  min-height: 36px;
+}
+.workspace > .notice {
+  margin: 12px;
+  border-radius: 8px;
+}
+#export-status {
+  font-size: 11px;
+  line-height: 1.7;
+  margin: 0;
+  padding: 12px 24px;
+  border-top: 1px solid var(--line);
+}
+#export-status:empty {
+  display: none;
+}
+.secondary {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.secondary:hover:not(:disabled) {
+  background: var(--accent-wash);
+}
+.details-section {
+  margin-top: 26px;
+  border-top: 0;
+}
+summary {
+  min-height: 58px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.plus {
+  font-size: 20px;
+  color: var(--faint);
+}
+.details-content {
+  padding: 12px 0 30px;
+}
+.reading-content,
+.settings-content {
+  gap: 64px;
+}
+.reading-intro > p {
+  font-size: 13px;
+}
+.lesson {
+  padding: 18px 22px;
+  border-color: var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.field-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+#format-select {
+  background: var(--panel);
+  font-size: 13px;
+  padding: 10px 12px;
+  min-height: 46px;
+  border-radius: 7px;
+}
+.settings-content .small-note {
+  font-size: 12px;
+  line-height: 1.9;
+}
+.format-actions {
+  gap: 0;
+}
+.format-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 0;
+}
+.format-action + .format-action {
+  border-top: 1px solid var(--line);
+}
+.format-action:first-child {
+  padding-top: 0;
+}
+.format-action strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 450;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.format-action p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.format-actions .button {
+  justify-content: center;
+  font-size: 11px;
+  min-height: 38px;
+  min-width: 88px;
+  padding: 0 12px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.format-actions > .small-note {
+  margin-top: 10px;
+  font-size: 11px;
+}
+.principle-copy {
+  gap: 0 64px;
+  font-size: 13px;
+}
+.source-block {
+  background: var(--panel);
+  padding: 20px;
+}
+footer {
+  min-height: 92px;
+  font-size: 11px;
+}
+
+.details-section {
+  margin-top: 20px;
+}
+footer {
+  min-height: 72px;
+}
+@media (max-width: 850px) {
+  .shell {
+    padding: 0 24px;
+  }
+  .card-heading {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .editor-card textarea {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .editor-meta,
+  .visual-toolbar {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .visual-section {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .workbar {
+    padding-left: 18px;
+    padding-right: 10px;
+  }
+  .work-actions .button {
+    padding: 0 6px;
+  }
+  .segmented button {
+    min-width: 54px;
+    padding: 0 7px;
+  }
+  .reading-content,
+  .settings-content {
+    gap: 30px;
+  }
+}
+@media (max-width: 700px) {
+  .shell {
+    padding: 0 18px;
+  }
+  .site-header {
+    height: 60px;
+  }
+  .wordmark {
+    font-size: 25px;
+    gap: 9px;
+  }
+  #logo-mark {
+    width: 18px;
+  }
+  .brand-code {
+    display: none;
+  }
+  .intro {
+    padding: 16px 0;
+    gap: 12px;
+  }
+  h1 {
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+  .convert-symbol {
+    font-size: 18px;
+    margin: 0 5px;
+  }
+  .intro-copy {
+    font-size: 11px;
+    margin: 0;
+  }
+  .workbench {
+    border-radius: 12px;
+  }
+  .editors {
+    display: block;
+    border-radius: 12px;
+  }
+  .editor-card:first-child {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .code-card {
+    border-radius: 0 0 12px 12px;
+  }
+  .card-heading {
+    min-height: 52px;
+    padding: 6px 16px 0;
+  }
+  .card-heading label {
+    font-size: 13px;
+  }
+  .button.compact {
+    min-height: 40px;
+    font-size: 11px;
+  }
+  .editor-card textarea {
+    height: 84px;
+    min-height: 0;
+    padding: 10px 16px;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .raw-card > textarea {
+    flex: none;
+  }
+  .editor-card textarea::placeholder {
+    font-size: 14px;
+  }
+  .editor-meta {
+    min-height: 24px;
+    padding: 0 16px 6px;
+  }
+  .workbar {
+    min-height: 46px;
+    padding: 0 10px 0 16px;
+    border-top: 0;
+  }
+  .work-actions .button {
+    font-size: 11px;
+    min-height: 44px;
+    padding: 0 7px;
+  }
+  .visual-toolbar {
+    min-height: 48px;
+    padding: 0 16px;
+    gap: 8px;
+  }
+  .segmented {
+    border: 0;
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+  .segmented button {
+    min-height: 40px;
+    min-width: 52px;
+    padding: 0 7px;
+  }
+  #export-toggle {
+    min-height: 44px;
+  }
+  .result-body {
+    height: 118px;
+  }
+  .code-card textarea {
+    height: 100%;
+    font-size: 22px;
+  }
+  .code-card textarea::placeholder {
+    font-size: 13px;
+  }
+  .visual-section {
+    padding: 10px 16px 0;
+  }
+  .result-meta {
+    min-height: 34px;
+    padding: 0 16px;
+  }
+  #edit-code {
+    min-height: 34px;
+  }
+  .preview-footer {
+    font-size: 10px;
+    min-height: 22px;
+  }
+  .preview-warning {
+    font-size: 10px;
+  }
+  .reading-content,
+  .settings-content {
+    display: block;
+  }
+  .lesson {
+    margin-top: 22px;
+  }
+  .format-actions {
+    margin-top: 24px;
+  }
+  .details-section {
+    margin-top: 14px;
+  }
+  summary {
+    min-height: 48px;
+    font-size: 12px;
+  }
+  .details-content {
+    padding-bottom: 24px;
+  }
+  .principle-copy {
+    font-size: 12px;
+  }
+  footer {
+    min-height: 64px;
+    padding-bottom: 12px;
+    font-size: 10px;
+  }
+}
+@media (max-width: 360px) {
+  .shell {
+    padding: 0 12px;
+  }
+  .intro-copy {
+    font-size: 10px;
+  }
+  .card-heading,
+  .visual-toolbar,
+  .editor-meta {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .editor-card textarea,
+  .visual-section {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .workbar {
+    padding-left: 14px;
+    padding-right: 8px;
+  }
+  .work-actions .button {
+    padding: 0 6px;
+  }
+  .segmented button {
+    min-width: 49px;
+  }
+  #export-toggle .icon {
+    display: none;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .site-header {
+    height: 54px;
+  }
+  .intro {
+    padding: 14px 0;
+  }
+  .result-body {
+    height: 160px;
+  }
+}
+
+.preview-footer span:not(:empty) {
+  padding-top: 0;
+}
+/* 保留编辑器聚焦背景时的外侧圆角，同时允许导出菜单伸出容器。 */
+.raw-card {
+  border-radius: 14px 0 0 14px;
+}
+@media (max-width: 700px) {
+  .raw-card {
+    border-radius: 12px 12px 0 0;
+  }
+}

@@ -1,142 +1,452 @@
-﻿<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="zh-CN">
   <head>
-    <title>⠀⡥⠀⡯⠀⡩⠀⡬⠀⡥⠀⡳</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
-    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
-    <link href="files/⠀⡥⠀⡯⠀⡩⠀⡬⠀⡥⠀⡳/styles.css" type="text/css" rel="stylesheet"/>
-    <script src="resources/scripts/jquery-3.2.1.min.js"></script>
-    <script src="resources/scripts/core/axQuery.js"></script>
-    <script src="resources/scripts/core/globals.js"></script>
-    <script src="resources/scripts/axutils.js"></script>
-    <script src="resources/scripts/core/annotation.js"></script>
-    <script src="resources/scripts/core/axQuery.std.js"></script>
-    <script src="resources/scripts/core/doc.js"></script>
-    <script src="resources/scripts/messagecenter.js"></script>
-    <script src="resources/scripts/core/events.js"></script>
-    <script src="resources/scripts/core/recording.js"></script>
-    <script src="resources/scripts/core/action.js"></script>
-    <script src="resources/scripts/core/expr.js"></script>
-    <script src="resources/scripts/core/geometry.js"></script>
-    <script src="resources/scripts/core/flyout.js"></script>
-    <script src="resources/scripts/core/model.js"></script>
-    <script src="resources/scripts/core/repeater.js"></script>
-    <script src="resources/scripts/core/sto.js"></script>
-    <script src="resources/scripts/core/utils.temp.js"></script>
-    <script src="resources/scripts/core/variables.js"></script>
-    <script src="resources/scripts/core/drag.js"></script>
-    <script src="resources/scripts/core/move.js"></script>
-    <script src="resources/scripts/core/visibility.js"></script>
-    <script src="resources/scripts/core/style.js"></script>
-    <script src="resources/scripts/core/adaptive.js"></script>
-    <script src="resources/scripts/core/tree.js"></script>
-    <script src="resources/scripts/core/init.temp.js"></script>
-    <script src="resources/scripts/core/legacy.js"></script>
-    <script src="resources/scripts/core/viewer.js"></script>
-    <script src="resources/scripts/core/math.js"></script>
-    <script src="resources/scripts/core/jquery.nicescroll.min.js"></script>
-    <script src="data/document.js"></script>
-    <script src="files/⠀⡥⠀⡯⠀⡩⠀⡬⠀⡥⠀⡳/data.js"></script>
-    <script type="text/javascript">
-      $axure.utils.getTransparentGifPath = function() { return 'resources/images/transparent.gif'; };
-      $axure.utils.getOtherPath = function() { return 'resources/Other.html'; };
-      $axure.utils.getReloadPath = function() { return 'resources/reload.html'; };
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="theme-color" content="#101213" />
+    <meta
+      name="description"
+      content="让文字有另一种形状。eoiles，在浏览器本地将文字转换为 Unicode 盲文点阵，切换黑白格，复制、还原与导出。"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>eoiles — 文字的另一种形状</title>
+    <script>
+      try {
+        var p = JSON.parse(localStorage.getItem("eoiles.preferences") || "{}");
+        document.documentElement.dataset.theme = ["light", "dark"].includes(
+          p.theme,
+        )
+          ? p.theme
+          : "system";
+      } catch {}
     </script>
   </head>
   <body>
-    <div id="base" class="">
-
-      <!-- Unnamed (Dynamic Panel) -->
-      <div id="u0" class="ax_default">
-        <div id="u0_state0" class="panel_state" data-label="welcome" style="">
-          <div id="u0_state0_content" class="panel_state_content">
-
-            <!-- Unnamed (Group) -->
-            <div id="u1" class="ax_default" data-left="0" data-top="0" data-width="1920" data-height="1080">
-
-              <!-- Unnamed (Rectangle) -->
-              <div id="u2" class="ax_default heading_1">
-                <div id="u2_div" class=""></div>
-                <div id="u2_text" class="text ">
-                  <p><span>eoiles&nbsp; &nbsp; ⇌ </span></p>
+    <a class="skip-link" href="#raw">跳到文字输入</a>
+    <div class="shell">
+      <header class="site-header">
+        <a href="/" class="wordmark" aria-label="eoiles 首页"
+          ><svg id="logo-mark" aria-hidden="true"></svg
+          ><span>eoiles<span class="brand-period">.</span></span></a
+        >
+        <div class="header-end">
+          <span id="brand-code" class="brand-code" aria-hidden="true"></span
+          ><label class="theme-control"
+            ><span id="theme-icon" aria-hidden="true">◐</span
+            ><select id="theme" aria-label="界面主题">
+              <option value="system">跟随系统</option>
+              <option value="dark">深色</option>
+              <option value="light">浅色</option></select
+            ><span aria-hidden="true">⌄</span></label
+          >
+        </div>
+      </header>
+      <main>
+        <section class="intro" aria-labelledby="title">
+          <h1 id="title">
+            文字 <span class="convert-symbol" aria-hidden="true">⇄</span> 点阵
+          </h1>
+          <p class="intro-copy">即时转换，自由还原。</p>
+        </section>
+        <section class="workbench workspace" aria-labelledby="workspace-title">
+          <h2 id="workspace-title" class="sr-only">文字与编码转换</h2>
+          <div class="editors">
+            <section class="editor-card raw-card" aria-labelledby="raw-label">
+              <div class="card-heading">
+                <label id="raw-label" for="raw">原文</label>
+                <button
+                  class="button quiet compact"
+                  id="copy-raw"
+                  data-keep-focus
+                >
+                  <span data-icon="copy"></span
+                  ><span class="button-label">复制原文</span>
+                </button>
+              </div>
+              <textarea
+                id="raw"
+                placeholder="输入文字，即刻转换…"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                autocomplete="off"
+                aria-describedby="raw-stats"
+              ></textarea>
+              <div class="editor-meta">
+                <span id="raw-stats">0 个可见字符 · 0 个码元</span
+                ><span id="raw-direction" class="sr-only">从这里开始</span>
+              </div>
+              <div class="workbar">
+                <div class="conversion-status">
+                  <span id="status-dot" class="tiny-dot"></span
+                  ><span id="status-text">输入即转换</span>
+                </div>
+                <div class="work-actions">
+                  <button class="button quiet" id="example" data-keep-focus>
+                    试试示例
+                  </button>
+                  <button
+                    class="button quiet"
+                    id="undo"
+                    data-keep-focus
+                    disabled
+                  >
+                    撤销
+                  </button>
+                  <button
+                    class="button quiet"
+                    id="clear"
+                    data-keep-focus
+                    disabled
+                  >
+                    清空
+                  </button>
                 </div>
               </div>
-
-              <!-- Unnamed (Rectangle) -->
-              <div id="u3" class="ax_default heading_1">
-                <div id="u3_div" class=""></div>
-                <div id="u3_text" class="text ">
-                  <p><span>⠀⡥⠀⡯⠀⡩⠀⡬⠀⡥⠀⡳</span></p>
+            </section>
+            <section class="editor-card code-card" aria-labelledby="code-label">
+              <div class="card-heading">
+                <label id="code-label" for="code">盲文编码</label>
+                <button
+                  class="button primary compact"
+                  id="copy-code"
+                  data-keep-focus
+                >
+                  <span data-icon="copy"></span
+                  ><span class="button-label">复制编码</span>
+                </button>
+              </div>
+              <div class="visual-toolbar">
+                <div class="segmented" role="group" aria-label="结果显示方式">
+                  <button
+                    id="mode-code"
+                    aria-pressed="true"
+                    aria-controls="code-pane"
+                    data-keep-focus
+                  >
+                    编码
+                  </button>
+                  <button
+                    id="mode-dots"
+                    aria-pressed="false"
+                    aria-controls="visual-pane"
+                    data-keep-focus
+                  >
+                    点阵
+                  </button>
+                  <button
+                    id="mode-tiles"
+                    aria-pressed="false"
+                    aria-controls="visual-pane"
+                    data-keep-focus
+                  >
+                    黑白格
+                  </button>
+                </div>
+                <div class="export-control" id="export-control">
+                  <button
+                    id="export-toggle"
+                    class="button quiet"
+                    aria-expanded="false"
+                    aria-controls="export-menu"
+                    data-keep-focus
+                  >
+                    <span data-icon="download"></span>导出<span
+                      class="chevron"
+                      aria-hidden="true"
+                      >⌄</span
+                    >
+                  </button>
+                  <div id="export-menu" class="export-menu" hidden>
+                    <button
+                      id="export-png"
+                      class="export-option"
+                      data-keep-focus
+                    >
+                      PNG 图片<span>适合分享</span>
+                    </button>
+                    <button
+                      id="export-svg"
+                      class="export-option"
+                      data-keep-focus
+                    >
+                      SVG 矢量图<span>适合编辑</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              <!-- Unnamed (Rectangle) -->
-              <div id="u4" class="ax_default flow_shape">
-                <div id="u4_div" class="" onclick="cleardefalut()"></div>
-                <div id="u4_text" class="text " style="display:none; visibility: hidden">
-                  <p></p>
+              <div id="result-body" class="result-body">
+                <div id="code-pane" class="result-pane">
+                  <textarea
+                    id="code"
+                    placeholder="结果会出现在这里；也可粘贴点阵还原。"
+                    spellcheck="false"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    autocomplete="off"
+                    aria-describedby="code-stats error-message"
+                    aria-invalid="false"
+                  ></textarea>
                 </div>
+                <section
+                  id="visual-pane"
+                  class="visual-section result-pane"
+                  aria-label="编码预览"
+                  hidden
+                >
+                  <div
+                    class="preview-surface"
+                    id="preview-surface"
+                    data-mode="dots"
+                  >
+                    <p id="preview-label" class="preview-warning" hidden></p>
+                    <span id="preview-format" class="sr-only"></span>
+                    <div
+                      id="preview-scroll"
+                      class="preview-scroll"
+                      tabindex="0"
+                      aria-label="编码预览，可滚动查看"
+                    >
+                      <svg
+                        id="preview"
+                        role="img"
+                        aria-label="编码的点阵预览"
+                      ></svg>
+                      <div id="preview-empty">
+                        <div class="empty-mark" aria-hidden="true">
+                          <i></i><i></i><i></i><i></i><i></i><i></i><i></i
+                          ><i></i>
+                        </div>
+                        <p>输入文字后，在这里查看形状。</p>
+                      </div>
+                    </div>
+                    <div class="preview-footer">
+                      <span id="preview-count">等待第一段文字</span
+                      ><span id="preview-legend">从上到下，再向右 →</span>
+                    </div>
+                  </div>
+                </section>
               </div>
-
-              <!-- Unnamed (Rectangle) -->
-              <div id="u5" class="ax_default flow_shape">
-                <div id="u5_div" class="" onclick="cleardefalut()"></div>
-                <div id="u5_text" class="text " style="display:none; visibility: hidden">
-                  <p></p>
-                </div>
+              <div class="editor-meta result-meta">
+                <span id="code-stats">0 个盲文字符</span
+                ><span id="format-badge" class="sr-only">魔法数字格式</span
+                ><button id="edit-code" class="text-button" hidden>
+                  编辑 / 粘贴编码
+                </button>
+              </div>
+            </section>
+          </div>
+          <div id="error-panel" class="notice error-notice" hidden>
+            <span data-icon="alert"></span>
+            <div>
+              <p id="error-message"></p>
+              <p id="stale-message"></p>
+              <div class="error-actions">
+                <button class="text-button" id="locate-error">定位问题</button
+                ><button class="text-button" id="clean" data-keep-focus>
+                  移除普通空格、换行与制表符
+                </button>
               </div>
             </div>
           </div>
-        </div>
-        <div id="u0_state1" class="panel_state" data-label="mainpage" style="visibility: hidden;">
-          <div id="u0_state1_content" class="panel_state_content">
-
-            <!-- Unnamed (Rectangle) -->
-            <div id="u6" class="ax_default box_1">
-              <div id="u6_div" class=""></div>
-              <div id="u6_text" class="text " style="display:none; visibility: hidden">
-                <p></p>
-              </div>
-            </div>
-
-            <!-- Input Stepper (Group) -->
-            <div id="u7" class="ax_default" data-label="Input Stepper" data-left="280" data-top="220" data-width="1362" data-height="588">
-
-              <!-- Unnamed (Text Area) -->
-              <div id="u8" class="ax_default text_area">
-                <div id="u8_div" class=""></div>
-                <textarea id="u8_input" class="u8_input" placeholder="eoiles">eoiles</textarea>
-              </div>
+          <div id="copy-fallback" class="notice" hidden>
+            <div>
+              <strong>浏览器未允许自动复制</strong>
+              <p>完整内容已放在下面。选中后使用系统的“复制”。</p>
+              <textarea
+                id="fallback-text"
+                readonly
+                aria-label="手动复制的完整内容"
+                spellcheck="false"
+              ></textarea
+              ><button class="text-button" id="select-fallback">全选内容</button
+              ><button class="text-button" id="close-fallback">收起</button>
             </div>
           </div>
-        </div>
-        <div id="u0_state2" class="panel_state" data-label="eo" style="visibility: hidden;">
-          <div id="u0_state2_content" class="panel_state_content">
 
-            <!-- Unnamed (Rectangle) -->
-            <div id="u9" class="ax_default box_1">
-              <div id="u9_div" class=""></div>
-              <div id="u9_text" class="text " style="display:none; visibility: hidden">
-                <p></p>
+          <p id="export-status" class="small-note" role="status"></p>
+        </section>
+        <section class="details-section" aria-label="帮助与设置">
+          <details id="reading">
+            <summary>
+              <span class="summary-leading">怎么读</span
+              ><span class="plus" aria-hidden="true">+</span>
+            </summary>
+            <div class="details-content reading-content">
+              <div class="reading-intro">
+                <p>
+                  每个 UTF-16 码元分成高、低两个字节。每个字节是一枚 2 × 4
+                  单元，默认从左列向下，再读右列。
+                </p>
+                <p id="reading-empty" class="small-note">
+                  还没有内容，先用明确标注的示例「A」演示。
+                </p>
+                <div class="unit-control">
+                  <label for="unit-index">选择码元</label
+                  ><input
+                    type="number"
+                    id="unit-index"
+                    min="1"
+                    value="1"
+                  /><span id="unit-total">/ 1</span
+                  ><span id="unit-label"></span>
+                </div>
+                <div class="reading-actions">
+                  <button
+                    class="button secondary"
+                    id="read-play"
+                    data-keep-focus
+                  >
+                    <span data-icon="play"></span
+                    ><span class="button-label">播放阅读过程</span></button
+                  ><button class="button quiet" id="read-step" data-keep-focus>
+                    下一步 →</button
+                  ><button class="button quiet" id="read-reset" data-keep-focus>
+                    重置
+                  </button>
+                </div>
+                <p id="reading-status" class="small-note" role="status">
+                  点击播放，或逐步查看每个位置。
+                </p>
+              </div>
+              <div class="lesson">
+                <div class="byte-titles">
+                  <span id="byte-high"></span><span id="byte-low"></span>
+                </div>
+                <svg
+                  id="reading-svg"
+                  role="img"
+                  aria-label="选中码元的两个字节和阅读顺序"
+                ></svg>
+                <p class="small-note">
+                  数字是阅读顺序；实心表示 1，空心表示 0。
+                </p>
+                <label class="check-label"
+                  ><input
+                    id="grid"
+                    type="checkbox"
+                  />在预览中显示辅助网格</label
+                >
               </div>
             </div>
-
-            <!-- Input Stepper (Group) -->
-            <div id="u10" class="ax_default" data-label="Input Stepper" data-left="280" data-top="220" data-width="1362" data-height="588">
-
-              <!-- Unnamed (Text Area) -->
-              <div id="u11" class="ax_default text_area">
-                <div id="u11_div" class=""></div>
-                <textarea id="u11_input" class="u11_input" placeholder="⠀⡥⠀⡯⠀⡩⠀⡬⠀⡥⠀⡳">⠀⡥⠀⡯⠀⡩⠀⡬⠀⡥⠀⡳</textarea>
+          </details>
+          <details id="settings">
+            <summary>
+              <span class="summary-leading"
+                >编码格式<span id="settings-caption" class="sr-only"
+                  >魔法数字 · 默认</span
+                ></span
+              ><span class="plus" aria-hidden="true">+</span>
+            </summary>
+            <div class="details-content settings-content">
+              <div>
+                <label class="field-label" for="format-select">编码规则</label
+                ><select id="format-select">
+                  <option value="remap">魔法数字（默认）</option>
+                  <option value="native">Unicode 原生映射（历史兼容）</option>
+                </select>
+                <p class="small-note">
+                  旧编码还原不正确时，可尝试历史兼容格式。两种格式无法自动识别；仅选择规则不会改动内容。
+                </p>
+                <p id="source-note" class="small-note"></p>
+              </div>
+              <div class="format-actions">
+                <div class="format-action">
+                  <div>
+                    <strong>从原文重新生成</strong>
+                    <p>保留文字，更新盲文编码。</p>
+                  </div>
+                  <button class="button secondary" id="format-encode">
+                    重新编码 <span aria-hidden="true">↗</span>
+                  </button>
+                </div>
+                <div class="format-action">
+                  <div>
+                    <strong>用另一种规则还原</strong>
+                    <p>保留编码，重新读取原文。</p>
+                  </div>
+                  <button class="button secondary" id="format-decode">
+                    重新解释 <span aria-hidden="true">↙</span>
+                  </button>
+                </div>
+                <p class="small-note">
+                  应用后可以撤销。点阵与黑白格的显示方式不受影响。
+                </p>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
+          </details>
+          <details id="principle">
+            <summary>
+              <span class="summary-leading">原理与源码</span
+              ><span class="plus" aria-hidden="true">+</span>
+            </summary>
+            <div class="details-content principle-content">
+              <div class="principle-copy">
+                <p>
+                  每个 UTF-16 码元拆成高字节和低字节，转为 8 位二进制后，用
+                  <code>73654210</code> 重排，加上
+                  <code>10240</code>，得到两个盲文字符。解码用
+                  <code>76514320</code> 逆向还原。
+                </p>
+                <p>
+                  空白盲文 <code>U+2800</code> 也是数据；空格、换行、emoji
+                  和组合序列原样保留。这里是一种文字编码实验，不是自然语言的盲文翻译，也不是加密。
+                </p>
+                <p>
+                  黑白格中
+                  <strong>1 始终是黑色，0 始终是白色</strong
+                  >。换行、间距、网格和教学数字都只存在于展示层，复制的是完整
+                  Unicode 编码。
+                </p>
+                <p>
+                  文字只留在当前页面的内存中。只保存主题、格式和显示偏好；刷新会清空文字。页面不使用分析服务或第三方字体。
+                </p>
+              </div>
+              <div class="source-block">
+                <div class="source-heading">
+                  <span>src/core.js · 实际运行的核心</span
+                  ><a
+                    href="https://github.com/eoiles/eoiles.github.io"
+                    target="_blank"
+                    rel="noreferrer"
+                    >GitHub ↗</a
+                  >
+                </div>
+                <pre id="core-source" tabindex="0"></pre>
+              </div>
+            </div>
+          </details>
+        </section>
+      </main>
+      <footer>
+        <span>本地转换，不保存文字。</span
+        ><a
+          href="https://github.com/eoiles/eoiles.github.io"
+          target="_blank"
+          rel="noreferrer"
+          >源码 <span aria-hidden="true">↗</span></a
+        >
+      </footer>
     </div>
-    <script src="resources/scripts/core/ios.js"></script>
-    <script src="resources/scripts/core/eval.js"></script>
+    <div id="mobile-bar">
+      <span id="mobile-status">写下文字，即刻转换</span
+      ><button id="mobile-copy" class="button primary" data-keep-focus>
+        <span data-icon="copy"></span><span class="button-label">复制编码</span>
+      </button>
+    </div>
+    <div
+      id="announcer"
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+    <noscript
+      >eoiles 需要启用 JavaScript 来在本地转换文字。你的内容不会上传。</noscript
+    >
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

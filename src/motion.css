@@ -1,0 +1,391 @@
+/* 光、触感、形态：所有效果只属于展示层。 */
+:root {
+  --ease: cubic-bezier(0.22, 0.8, 0.25, 1);
+  --view: 260ms;
+}
+body {
+  color: var(--ink);
+}
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 650px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 65% 0%,
+    color-mix(in srgb, var(--accent) 6%, transparent),
+    transparent 65%
+  );
+  opacity: 0.7;
+}
+.shell {
+  position: relative;
+}
+.editors,
+.preview-surface {
+  position: relative;
+  isolation: isolate;
+  background-image: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--accent) 2.5%, transparent),
+    transparent 45%
+  );
+  transition:
+    border-color var(--view) var(--ease),
+    box-shadow var(--view) var(--ease),
+    background-color var(--view) var(--ease);
+}
+.editors {
+  box-shadow:
+    0 12px 44px #0000000c,
+    inset 0 1px 0 #ffffff05;
+}
+.editors:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--accent) 4%, transparent),
+    0 14px 45px #0000000c;
+}
+.editor-card {
+  position: relative;
+  transition:
+    background-color var(--view) var(--ease),
+    border-color var(--view);
+}
+.editor-card::before {
+  content: "";
+  position: absolute;
+  top: 17px;
+  bottom: 17px;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transform: scaleY(0.35);
+  transition:
+    opacity 180ms,
+    transform var(--view) var(--ease);
+  pointer-events: none;
+}
+.editor-card:focus-within::before {
+  opacity: 0.7;
+  transform: scaleY(1);
+}
+.card-heading label {
+  transition: color 180ms;
+}
+.editor-card:focus-within .card-heading label {
+  color: var(--accent);
+}
+@supports (mask-composite: exclude) {
+  .editors::after,
+  .preview-surface::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 2;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      250px circle at var(--light-x, 50%) var(--light-y, 0%),
+      color-mix(in srgb, var(--accent) 55%, transparent),
+      transparent 75%
+    );
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 240ms;
+  }
+  .editors[data-lit]::after,
+  .preview-surface[data-lit]::after {
+    opacity: 0.65;
+  }
+}
+.button,
+.text-button,
+.export-option {
+  transition:
+    background-color var(--fast),
+    color var(--fast),
+    box-shadow 180ms var(--ease),
+    transform 180ms var(--ease),
+    opacity var(--fast),
+    border-color var(--fast);
+}
+.primary {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 #ffffff25 inset,
+    0 3px 10px #00000012;
+}
+.primary::after {
+  content: "";
+  position: absolute;
+  inset: -60% -20%;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    #ffffff30 50%,
+    transparent 70%
+  );
+  pointer-events: none;
+  transform: translateX(-140%);
+  opacity: 0;
+}
+#copy-code .button-label,
+#copy-raw .button-label,
+#mobile-copy .button-label {
+  min-width: 4em;
+  text-align: center;
+}
+.button.done .icon {
+  animation: check-arrive 240ms var(--ease);
+}
+.button.done .icon path {
+  stroke-dasharray: 24;
+  animation: check-draw 260ms var(--ease);
+}
+.button.done .button-label {
+  animation: label-arrive 180ms var(--ease);
+}
+@keyframes check-arrive {
+  from {
+    transform: scale(0.8);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes check-draw {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes label-arrive {
+  from {
+    opacity: 0.3;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .button.primary:hover:not(:disabled) {
+    filter: none;
+    box-shadow:
+      0 1px 0 #ffffff30 inset,
+      0 5px 18px color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .primary:hover:not(:disabled)::after {
+    opacity: 1;
+    transform: translateX(140%);
+    transition: transform 480ms var(--ease);
+  }
+  .export-option:hover {
+    transform: translateX(2px);
+  }
+  summary:hover .plus {
+    color: var(--accent);
+  }
+  .wordmark:hover #logo-mark {
+    transform: translateY(-1px);
+  }
+}
+button:active:not(:disabled),
+.button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
+  transition-duration: 100ms;
+}
+#logo-mark {
+  transition: transform 180ms var(--ease);
+}
+.theme-control {
+  transition: color 180ms;
+}
+.theme-control:hover {
+  color: var(--ink);
+}
+#theme-icon {
+  display: inline-block;
+  transition:
+    transform 300ms var(--ease),
+    color 240ms;
+}
+:root[data-resolved-theme="light"] #theme-icon {
+  transform: rotate(180deg);
+}
+.segmented {
+  position: relative;
+  isolation: isolate;
+}
+.segmented::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  width: calc((100% - 10px) / 3);
+  border-radius: 5px;
+  background: var(--accent-wash);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 10%, transparent),
+    0 2px 7px #00000008;
+  transform: translateX(0);
+  transition:
+    transform 280ms var(--ease),
+    background-color var(--view),
+    box-shadow var(--view);
+}
+.segmented:has(#mode-dots[aria-pressed="true"])::before {
+  transform: translateX(calc(100% + 2px));
+}
+.segmented:has(#mode-tiles[aria-pressed="true"])::before {
+  transform: translateX(calc(200% + 4px));
+}
+.segmented button {
+  flex: 1;
+}
+.segmented button[aria-pressed="true"] {
+  background: transparent;
+}
+.segmented .icon {
+  transition: transform 240ms var(--ease);
+}
+.segmented button[aria-pressed="true"] .icon {
+  transform: scale(1.06);
+}
+.bit {
+  transition:
+    rx 220ms var(--ease),
+    transform 220ms var(--ease),
+    fill 160ms var(--ease);
+}
+[data-morphing] .bit {
+  transition-duration: 240ms, 240ms, 200ms;
+  transition-delay: var(--morph-delay, 0ms);
+}
+[data-morphing] .cell-bg {
+  transition-delay: var(--morph-delay, 0ms);
+}
+.cell-bg {
+  transition: opacity 220ms var(--ease);
+}
+.grid-line,
+.group-line {
+  transition: opacity 180ms;
+}
+.preview-footer {
+  transition: color var(--view);
+}
+.export-menu {
+  animation: none;
+  transform-origin: top right;
+  box-shadow:
+    0 14px 40px #00000022,
+    0 2px 5px #0000000b;
+}
+.chevron {
+  display: inline-block;
+  transition: transform 180ms var(--ease);
+}
+#export-toggle[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+details[open] .details-content {
+  animation: none;
+}
+details .plus {
+  transform: rotate(0);
+  transition:
+    transform 280ms var(--ease),
+    color 180ms;
+}
+details[data-expanded="true"] .plus {
+  transform: rotate(45deg);
+}
+details,
+.details-section {
+  transition: border-color var(--view);
+}
+.notice,
+.lesson,
+.source-block,
+#format-select,
+.unit-control input,
+#mobile-bar {
+  transition:
+    background-color var(--view) var(--ease),
+    color var(--view),
+    border-color var(--view);
+}
+.page-enter .site-header {
+  animation: enter-soft 360ms var(--ease) both;
+}
+.page-enter .intro {
+  animation: enter-heading 440ms var(--ease) both;
+}
+.page-enter .workspace {
+  animation: enter-soft 420ms 30ms var(--ease) both;
+}
+.page-enter .visual-section {
+  animation: enter-soft 440ms 70ms var(--ease) both;
+}
+.page-enter .details-section,
+.page-enter footer {
+  animation: enter-soft 440ms 110ms var(--ease) both;
+}
+@keyframes enter-soft {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes enter-heading {
+  from {
+    opacity: 0.5;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0ms !important;
+    transition-delay: 0ms !important;
+  }
+  .editors::after,
+  .preview-surface::after,
+  .primary::after {
+    display: none;
+  }
+  .button:hover:not(:disabled),
+  button:active:not(:disabled),
+  .export-option:hover {
+    transform: none;
+  }
+}
+
+.preview-surface {
+  background-image: none;
+}

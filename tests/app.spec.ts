@@ -163,9 +163,7 @@ test("clear, example, and format actions preserve recoverable content", async ({
   await page.locator("#undo").click();
   await expect(page.locator("#raw")).toHaveValue("我的内容😀");
   await page.locator("#settings summary").click();
-  await page.locator("#format-select").selectOption("native");
-  await expect(page.locator("#code")).toHaveValue(enc("我的内容😀"));
-  await page.locator("#format-encode").click();
+  await page.locator("#format-native").click();
   await expect(page.locator("#raw")).toHaveValue("我的内容😀");
   await expect(page.locator("#code")).toHaveValue(
     encode("我的内容😀", "native"),
@@ -173,8 +171,7 @@ test("clear, example, and format actions preserve recoverable content", async ({
   await page.locator("#undo").click();
   await expect(page.locator("#code")).toHaveValue(enc("我的内容😀"));
   await page.locator("#code").fill(encode("历史内容", "native"));
-  await page.locator("#format-select").selectOption("native");
-  await page.locator("#format-decode").click();
+  await page.locator("#format-native").click();
   await expect(page.locator("#raw")).toHaveValue("历史内容");
   await expect(page.locator("#code")).toHaveValue(encode("历史内容", "native"));
 });
@@ -304,22 +301,26 @@ test("SVG and PNG contain full cells, including blank cells at both ends", async
   expect(png.readUInt32BE(20)).toBe(128);
 });
 
-test("tutorial is opt-in, selects UTF-16 units and reduced motion steps", async ({
+test("tutorial is opt-in, selects characters and reduced motion steps", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.locator("#raw").fill("😀A");
   await page.locator("#reading summary").click();
-  await expect(page.locator("#unit-total")).toHaveText("/ 3");
-  await expect(page.locator("#unit-label")).toContainText("D83D");
+  await expect(page.locator("#character-choices button")).toHaveText([
+    "😀",
+    "A",
+  ]);
+  await expect(page.locator("#part-label")).toHaveText("😀 · 第 1 / 2 组");
   await page.locator("#read-play").click();
   await expect(page.locator("#reading-status")).toContainText("第 1 步");
   await page.waitForTimeout(600);
   await expect(page.locator("#reading-status")).toContainText("第 1 步");
   await page.locator("#read-step").click();
   await expect(page.locator("#reading-status")).toContainText("第 2 步");
-  await page.locator("#unit-index").fill("3");
-  await expect(page.locator("#unit-label")).toContainText("0041");
+  await page.getByRole("button", { name: "查看文字 A", exact: true }).click();
+  await expect(page.locator("#part-control")).toBeHidden();
+  await expect(page.locator("#byte-low .byte-bits")).toHaveText("01000001");
 });
 
 test("responsive widths, landscape, keyboard-sized viewport, no overflow", async ({
@@ -487,8 +488,7 @@ test("system theme follows media and native mapped bits match their actual glyph
     )
     .toBe("rgb(16, 18, 19)");
   await page.locator("#settings summary").click();
-  await page.locator("#format-select").selectOption("native");
-  await page.locator("#format-encode").click();
+  await page.locator("#format-native").click();
   await page.locator("#raw").fill("A");
   await expect(page.locator("#code")).toHaveValue("\u2800\u2841");
   const bits = await page

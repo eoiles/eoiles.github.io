@@ -11,7 +11,16 @@ import {
 } from "./motion";
 import { enc, tobin } from "./core.js";
 import coreSource from "./core.js?raw";
-import { bits, encode, cleanWhitespace, pointNumbers } from "./protocol.js";
+import protocolSource from "./protocol.js?raw";
+import {
+  formatNames,
+  readingOrder,
+  characterAt,
+  characterLabel,
+  highlightSource,
+} from "./reading";
+import "./reading.css";
+import { bits, encode, cleanWhitespace } from "./protocol.js";
 import {
   convert,
   type Format,
@@ -112,6 +121,11 @@ let worker: Worker | null = null;
 const previewLimit = 256;
 const cellSize = 14; // 合适的默认尺寸，按完整码元自动换行。
 const feedbackTimers = new Map<string, number>();
+let sourceFormat: Format | null = null;
+let lessonOffset = 0,
+  lessonPart = 0,
+  exampleIndex = 0;
+const readingExamples = ["A", "中", "😀"];
 
 function remember(snapshot = state) {
   history.push({ ...snapshot });
@@ -163,7 +177,7 @@ function refresh() {
   const pending = busy || !!composing;
   text(
     "raw-stats",
-    `${pending ? "字符统计待完成" : state.graphemes === null ? "可见字符未计数" : state.graphemes + " 个可见字符"} · ${state.raw.length} 个码元`,
+    `${pending ? "正在统计…" : state.graphemes === null ? "字符未计数" : state.graphemes + " 个字符"}`,
   );
   text(
     "code-stats",
@@ -177,20 +191,23 @@ function refresh() {
         ? "文字 → 编码"
         : "编码 → 文字",
   );
-  const fmt = state.format === "remap";
-  text("format-badge", fmt ? "魔法数字格式" : "原生映射 · 兼容");
-  text(
-    "settings-caption",
-    fmt ? "魔法数字 · 默认" : "Unicode 原生映射 · 历史兼容",
-  );
-  text(
-    "preview-format",
-    state.validFormat === "remap" ? "MAGIC REMAP" : "NATIVE MAPPING",
-  );
+  text("format-badge", formatNames[state.format]);
+  text("settings-caption", formatNames[state.format]);
+  text("preview-format", formatNames[state.validFormat]);
   text(
     "source-note",
-    `最近编辑的是${state.source === "raw" ? "原文" : "编码"}。${state.error ? "当前编码无效，原文为上次有效结果。" : "下方动作会明确选择保留哪一侧。"}`,
+    state.source === "raw"
+      ? "保留原文，立即转换。切换可撤销。"
+      : "保留编码，立即还原。切换可撤销。",
   );
+  for (const format of ["remap", "native"] as const) {
+    button(`format-${format}`).setAttribute(
+      "aria-pressed",
+      String(state.format === format),
+    );
+    button(`format-${format}`).disabled = !!composing;
+  }
+  updateSource();
   setStatus(
     statusMessage(),
     state.error ? "error" : pending ? "pending" : "valid",
@@ -218,8 +235,6 @@ function refresh() {
   button("export-toggle").disabled = !state.validCode || pending || exporting;
   button("export-svg").disabled = !state.validCode || pending || exporting;
   button("export-png").disabled = !state.validCode || pending || exporting;
-  button("format-encode").disabled = pending;
-  button("format-decode").disabled = pending;
   text(
     "preview-label",
     state.error ? "上次有效结果 · 当前编码待修正" : "同一份编码，不同的形状",
@@ -234,8 +249,8 @@ function refresh() {
   );
   const cr = state.raw.includes("\r");
   $("raw-stats").title = cr
-    ? "原始 CR / CRLF 已保留；编辑框统一显示为换行。可见字符按字素簇统计。"
-    : "可见字符按字素簇统计，包括空格和换行；码元按 UTF-16 统计。";
+    ? `原始 CR / CRLF 已保留。按字素簇统计字符；共 ${state.raw.length} 个 UTF-16 码元。`
+    : `按字素簇统计字符，包括空格和换行；共 ${state.raw.length} 个 UTF-16 码元。`;
   schedulePreview();
   updateMobileBar();
 }
@@ -245,6 +260,7 @@ function applyResult(result: Result) {
   if (result.error) {
     state.error = result.error;
     refresh();
+    updateLesson();
     announce(result.error.message);
     return;
   }
@@ -413,9 +429,9 @@ function perform(
   state.format = format;
   prefs.format = format;
   persist();
-  $<HTMLSelectElement>("format-select").value = format;
   writeEditor(source, value);
   requestConversion();
+  updateLesson();
   notify(message);
 }
 function undo() {
@@ -428,7 +444,6 @@ function undo() {
   state = prior;
   prefs.format = state.format;
   persist();
-  $<HTMLSelectElement>("format-select").value = state.format;
   writeEditor("raw", state.raw);
   writeEditor("code", state.code);
   actionMessage = "";
@@ -449,20 +464,36 @@ button("locate-error").onclick = () => {
   code.setSelectionRange(i, i + 1);
   code.scrollIntoView({ block: "nearest" });
 };
-button("format-encode").onclick = () =>
-  perform(
-    "raw",
-    state.raw,
-    "已重新编码",
-    $<HTMLSelectElement>("format-select").value as Format,
+for (const format of ["remap", "native"] as const)
+  button(`format-${format}`).onclick = () => {
+    if (composing || format === state.format) return;
+    perform(
+      state.source,
+      state[state.source],
+      `已切换：${formatNames[format]}`,
+      format,
+    );
+  };
+
+function updateSource() {
+  if (sourceFormat === state.format) return;
+  sourceFormat = state.format;
+  const natural = state.format === "remap";
+  const filename = natural ? "core.js" : "protocol.js";
+  const source = natural
+    ? coreSource
+    : protocolSource.split(/\r?\nexport function validate\(/)[0].trimEnd();
+  highlightSource($("core-source"), source);
+  text("source-title", `${formatNames[state.format]} · src/${filename}`);
+  $<HTMLAnchorElement>("source-link").href =
+    `https://github.com/eoiles/eoiles.github.io/blob/master/src/${filename}`;
+  text(
+    "principle-description",
+    natural
+      ? "自然顺序把二进制从左列向下放入点阵，再继续右列。解码时按相同顺序取回。"
+      : "Unicode 原生直接使用盲文点位的位权。读取时按图中的编号，从高位到低位取回二进制。",
   );
-button("format-decode").onclick = () =>
-  perform(
-    "code",
-    state.code,
-    "已重新解释",
-    $<HTMLSelectElement>("format-select").value as Format,
-  );
+}
 
 async function copy(side: Side, id: string) {
   const value = state[side],
@@ -655,9 +686,9 @@ new ResizeObserver(() => renderPreview(true)).observe($("result-body"));
 $("preview").addEventListener("click", (event) => {
   const group = (event.target as Element).closest<SVGGElement>("[data-unit]");
   if (!group) return;
-  $<HTMLInputElement>("unit-index").value = String(
-    Number(group.dataset.unit) + 1,
-  );
+  const offset = Number(group.dataset.unit);
+  lessonOffset = offset;
+  lessonPart = offset - characterAt(state.validRaw, offset).index;
   setDisclosure($<HTMLDetailsElement>("reading"), true);
   updateLesson();
 });
@@ -752,51 +783,136 @@ for (const kind of ["svg", "png"] as const) {
 }
 
 function selectedUnit() {
-  const value = state.validRaw || "A",
-    input = $<HTMLInputElement>("unit-index");
-  const index = Math.min(
-    value.length - 1,
-    Math.max(0, (Number(input.value) || 1) - 1),
+  const example = !state.validCode;
+  const value = example ? readingExamples[exampleIndex] : state.validRaw;
+  const character = characterAt(value, example ? 0 : lessonOffset);
+  const part = Math.min(lessonPart, character.text.length - 1);
+  const index = character.index + part;
+  return {
+    value,
+    character,
+    part,
+    index,
+    unit: value[index],
+    number: value.charCodeAt(index),
+    format: example ? state.format : state.validFormat,
+    example,
+  };
+}
+function updateCharacterPicker() {
+  const { value, character, part, example } = selectedUnit();
+  text("reading-context", example ? "试读示例" : "选择文字");
+  button("character-prev").hidden = example;
+  button("character-next").hidden = example;
+  button("character-prev").disabled = character.index === 0;
+  button("character-next").disabled = character.end >= value.length;
+  const fragment = document.createDocumentFragment();
+  const entries = example
+    ? readingExamples.map((text, index) => ({ text, index }))
+    : (() => {
+        const before = [],
+          after = [];
+        let cursor = character.index;
+        for (let i = 0; i < 2 && cursor > 0; i++) {
+          const item = characterAt(value, cursor - 1);
+          before.unshift(item);
+          cursor = item.index;
+        }
+        cursor = character.end;
+        for (let i = 0; i < 2 && cursor < value.length; i++) {
+          const item = characterAt(value, cursor);
+          after.push(item);
+          cursor = item.end;
+        }
+        return [...before, character, ...after];
+      })();
+  for (const item of entries) {
+    const el = document.createElement("button");
+    el.className = "character-choice";
+    el.dataset.keepFocus = "";
+    el.dataset.character = String(item.index);
+    el.textContent = characterLabel(item.text);
+    el.title = item.text;
+    el.setAttribute(
+      "aria-label",
+      `查看${example ? "示例" : "文字"} ${characterLabel(item.text)}`,
+    );
+    el.setAttribute(
+      "aria-pressed",
+      String(item.index === (example ? exampleIndex : character.index)),
+    );
+    fragment.append(el);
+  }
+  // 保留键盘正在操作的选字按钮，不影响主编辑区。
+  const focused = $("character-choices").contains(document.activeElement)
+    ? (document.activeElement as HTMLElement).dataset.character
+    : undefined;
+  $("character-choices").replaceChildren(fragment);
+  if (focused !== undefined)
+    $("character-choices")
+      .querySelector<HTMLButtonElement>(`[data-character="${focused}"]`)
+      ?.focus({ preventScroll: true });
+  show("part-control", character.text.length > 1);
+  text(
+    "part-label",
+    `${characterLabel(character.text)} · 第 ${part + 1} / ${character.text.length} 组`,
   );
-  return { value, index, unit: value[index], number: value.charCodeAt(index) };
+  button("part-prev").disabled = part === 0;
+  button("part-next").disabled = part === character.text.length - 1;
 }
 function updateLesson() {
   stopLesson();
   lessonStep = -1;
-  const { value, index, unit, number } = selectedUnit();
-  $<HTMLInputElement>("unit-index").max = String(value.length);
-  $<HTMLInputElement>("unit-index").value = String(index + 1);
-  text("unit-total", `/ ${value.length}`);
+  const { unit, number, format } = selectedUnit();
+  const order = readingOrder(format);
+  const stale = state.validCode && (state.error || busy);
   text(
-    "unit-label",
-    `U+${number.toString(16).toUpperCase().padStart(4, "0")}${number >= 0xd800 && number <= 0xdfff ? " · 代理码元" : ` · ${JSON.stringify(unit)}`}`,
+    "reading-format",
+    `${stale ? "上次有效结果 · " : ""}${formatNames[format]}`,
   );
-  show("reading-empty", !state.validRaw);
-  text("byte-high", `高字节 · ${tobin(number >> 8, 8)}`);
-  text("byte-low", `低字节 · ${tobin(number & 255, 8)}`);
-  const encoded = encode(unit, state.validFormat),
+  text(
+    "reading-description",
+    format === "remap"
+      ? "先从上到下读左列，再读右列。"
+      : "从右下角开始，按编号从高位读到低位。",
+  );
+  updateCharacterPicker();
+  for (const [byte, id, value] of [
+    [0, "byte-high", number >> 8],
+    [1, "byte-low", number & 255],
+  ] as const) {
+    $(id).innerHTML =
+      `<span class="byte-name">${byte ? "后" : "前"} 8 位</span><span class="byte-bits">${tobin(
+        value,
+        8,
+      )
+        .split("")
+        .map(
+          (bit: string, index: number) =>
+            `<span data-bit-step="${byte * 8 + index}" data-on="${bit}">${bit}</span>`,
+        )
+        .join("")}</span>`;
+  }
+  const encoded = encode(unit, format),
     svg = $<SVGSVGElement>("reading-svg");
   svg.setAttribute("viewBox", "0 0 340 145");
+  svg.dataset.format = format;
   let markup = "";
   for (let byte = 0; byte < 2; byte++)
     bits(encoded[byte]).forEach((on: number, k: number) => {
       const x = 25 + byte * 175 + Math.floor(k / 4) * 65,
         y = 18 + (k % 4) * 33;
-      markup += `<circle class="lesson-bit" data-on="${on}" data-step="${byte * 8 + k}" cx="${x}" cy="${y}" r="8"/><text class="lesson-num" x="${x + 15}" y="${y + 4}">${k + 1}</text><path class="lesson-arrow" data-arrow="${byte * 8 + k}" d="M${x - 20} ${y}h8m-4-4 4 4-4 4"/>`;
+      const step = order.indexOf(k);
+      markup += `<circle class="lesson-bit" data-on="${on}" data-step="${byte * 8 + step}" data-position="${k}" cx="${x}" cy="${y}" r="8"/><text class="lesson-num" data-number-step="${byte * 8 + step}" x="${x + 15}" y="${y + 4}">${step + 1}</text><path class="lesson-arrow" data-arrow="${byte * 8 + step}" d="M${x - 20} ${y}h8m-4-4 4 4-4 4"/>`;
     });
   svg.innerHTML = markup;
-  text(
-    "reading-status",
-    state.validFormat === "native"
-      ? "原生兼容格式：按实际 Unicode 点位展示，阅读顺序不再对应字节的高位到低位。"
-      : "点击播放，或逐步查看每个位置。",
-  );
+  text("reading-status", "按图中的 1–8 读取，先前 8 位，再后 8 位。");
 }
 function stopLesson() {
   clearTimeout(lessonTimer);
   lessonTimer = 0;
   button("read-play").innerHTML =
-    icon("play") + '<span class="button-label">播放阅读过程</span>';
+    icon("play") + '<span class="button-label">播放顺序</span>';
 }
 function stepLesson() {
   lessonStep = (lessonStep + 1) % 16;
@@ -810,13 +926,27 @@ function stepLesson() {
     .forEach((el) =>
       el.classList.toggle("active", Number(el.dataset.arrow) === lessonStep),
     );
-  const unit = selectedUnit().unit,
+  document
+    .querySelectorAll<HTMLElement>("[data-bit-step]")
+    .forEach((el) =>
+      el.classList.toggle("active", Number(el.dataset.bitStep) === lessonStep),
+    );
+  document
+    .querySelectorAll<SVGElement>("[data-number-step]")
+    .forEach((el) =>
+      el.classList.toggle(
+        "active",
+        Number(el.dataset.numberStep) === lessonStep,
+      ),
+    );
+  const { unit, format } = selectedUnit(),
     byte = Math.floor(lessonStep / 8),
-    k = lessonStep % 8;
-  const bit = bits(encode(unit, state.validFormat)[byte])[k];
+    step = lessonStep % 8;
+  const k = readingOrder(format)[step];
+  const bit = bits(encode(unit, format)[byte])[k];
   text(
     "reading-status",
-    `${byte ? "低" : "高"}字节 · 第 ${k + 1} 步：${k < 4 ? "左" : "右"}列第 ${(k % 4) + 1} 行，Unicode 点位 ${pointNumbers[k]}，值为 ${bit}。`,
+    `${byte ? "后" : "前"} 8 位 · 第 ${step + 1} 步：${k < 4 ? "左" : "右"}列第 ${(k % 4) + 1} 行，读作 ${bit}。`,
   );
 }
 button("read-step").onclick = () => {
@@ -843,7 +973,37 @@ button("read-play").onclick = () => {
     icon("pause") + '<span class="button-label">暂停</span>';
   tick();
 };
-$<HTMLInputElement>("unit-index").oninput = updateLesson;
+$("character-choices").onclick = (event) => {
+  const el = (event.target as Element).closest<HTMLButtonElement>(
+    "[data-character]",
+  );
+  if (!el) return;
+  if (state.validCode) lessonOffset = Number(el.dataset.character);
+  else exampleIndex = Number(el.dataset.character);
+  lessonPart = 0;
+  updateLesson();
+};
+button("character-prev").onclick = () => {
+  const { character } = selectedUnit();
+  lessonOffset = Math.max(0, character.index - 1);
+  lessonPart = 0;
+  updateLesson();
+};
+button("character-next").onclick = () => {
+  const { character, value } = selectedUnit();
+  lessonOffset = Math.min(value.length - 1, character.end);
+  lessonPart = 0;
+  updateLesson();
+};
+button("part-prev").onclick = () => {
+  lessonPart = Math.max(0, selectedUnit().part - 1);
+  updateLesson();
+};
+button("part-next").onclick = () => {
+  const { part, character } = selectedUnit();
+  lessonPart = Math.min(character.text.length - 1, part + 1);
+  updateLesson();
+};
 $("reading").addEventListener("toggle", () => {
   if (!$<HTMLDetailsElement>("reading").open) stopLesson();
 });
@@ -883,12 +1043,10 @@ document
   .querySelectorAll<HTMLElement>("[data-icon]")
   .forEach((el) => (el.outerHTML = icon(el.dataset.icon!)));
 code.placeholder = "编码会出现在这里。\n也可粘贴点阵，立即还原原文。";
-text("core-source", coreSource);
 const brandCode = enc("eoiles");
 text("brand-code", brandCode);
 // 品牌小标同样来自默认算法：e 的低字节，不手填装饰编码。
 renderSvg($<SVGSVGElement>("logo-mark"), enc("e").slice(1), 7, 22);
-$<HTMLSelectElement>("format-select").value = state.format;
 applyTheme();
 applyView();
 refresh();

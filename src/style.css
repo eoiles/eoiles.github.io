@@ -706,7 +706,7 @@ summary::-webkit-details-marker {
   font-size: 18px;
   transition: transform var(--view) var(--ease);
 }
-details[open] .plus {
+details[open] > summary .plus {
   transform: rotate(45deg);
 }
 details[open] > summary {

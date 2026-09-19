@@ -11,7 +11,11 @@ test("WCAG AA: populated preview, error and expanded help in both themes", async
     await page.locator("#example").click();
     await page.locator("#reading summary").click();
     await page.locator("#settings summary").click();
-    await page.locator("#principle summary").click();
+    await page.locator("#principle > summary").click();
+    await page.locator("#source-details > summary").click();
+    await page
+      .locator(theme === "dark" ? "#format-native" : "#format-remap")
+      .click();
     await page.locator("#code").fill("X");
     // 等待所有短过渡结束后度量最终颜色。
     await page.waitForTimeout(300);
@@ -27,8 +31,9 @@ test("WCAG AA: populated preview, error and expanded help in both themes", async
         })),
       })),
     ).toEqual([]);
+    await page.locator("#source-details > summary").click();
     await page.locator("#reading summary").click();
     await page.locator("#settings summary").click();
-    await page.locator("#principle summary").click();
+    await page.locator("#principle > summary").click();
   }
 });

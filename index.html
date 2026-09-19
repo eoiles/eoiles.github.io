@@ -232,7 +232,7 @@
               </div>
               <div class="editor-meta result-meta">
                 <span id="code-stats">0 个盲文字符</span
-                ><span id="format-badge" class="sr-only">魔法数字格式</span
+                ><span id="format-badge" class="sr-only">自然顺序</span
                 ><button id="edit-code" class="text-button" hidden>
                   编辑 / 粘贴编码
                 </button>
@@ -270,6 +270,39 @@
           <p id="export-status" class="small-note" role="status"></p>
         </section>
         <section class="details-section" aria-label="帮助与设置">
+          <details id="settings">
+            <summary>
+              <span class="summary-leading"
+                >编码方式
+                <span id="settings-caption" class="summary-caption"
+                  >自然顺序</span
+                ></span
+              ><span class="plus" aria-hidden="true">+</span>
+            </summary>
+            <div class="details-content settings-content">
+              <div class="format-options" role="group" aria-label="编码方式">
+                <button
+                  id="format-remap"
+                  class="format-option"
+                  aria-pressed="true"
+                  data-keep-focus
+                >
+                  <strong>自然顺序</strong><span>向下，再向右</span
+                  ><span data-icon="check"></span>
+                </button>
+                <button
+                  id="format-native"
+                  class="format-option"
+                  aria-pressed="false"
+                  data-keep-focus
+                >
+                  <strong>Unicode 原生</strong><span>兼容旧版编码</span
+                  ><span data-icon="check"></span>
+                </button>
+              </div>
+              <p id="source-note" class="small-note"></p>
+            </div>
+          </details>
           <details id="reading">
             <summary>
               <span class="summary-leading">怎么读</span
@@ -277,22 +310,54 @@
             </summary>
             <div class="details-content reading-content">
               <div class="reading-intro">
-                <p>
-                  每个 UTF-16 码元分成高、低两个字节。每个字节是一枚 2 × 4
-                  单元，默认从左列向下，再读右列。
-                </p>
-                <p id="reading-empty" class="small-note">
-                  还没有内容，先用明确标注的示例「A」演示。
-                </p>
-                <div class="unit-control">
-                  <label for="unit-index">选择码元</label
-                  ><input
-                    type="number"
-                    id="unit-index"
-                    min="1"
-                    value="1"
-                  /><span id="unit-total">/ 1</span
-                  ><span id="unit-label"></span>
+                <p id="reading-format" class="reading-format">自然顺序</p>
+                <p id="reading-description">先从上到下读左列，再读右列。</p>
+                <div class="reading-picker">
+                  <span id="reading-context" class="picker-label"
+                    >试读示例</span
+                  >
+                  <div class="character-selector">
+                    <button
+                      id="character-prev"
+                      class="character-nav"
+                      aria-label="前一个字"
+                      data-keep-focus
+                    >
+                      ‹
+                    </button>
+                    <div
+                      id="character-choices"
+                      role="group"
+                      aria-label="选择要查看的文字"
+                    ></div>
+                    <button
+                      id="character-next"
+                      class="character-nav"
+                      aria-label="后一个字"
+                      data-keep-focus
+                    >
+                      ›
+                    </button>
+                  </div>
+                  <div id="part-control" hidden>
+                    <button
+                      id="part-prev"
+                      class="character-nav"
+                      aria-label="前一组点阵"
+                      data-keep-focus
+                    >
+                      ‹
+                    </button>
+                    <span id="part-label"></span>
+                    <button
+                      id="part-next"
+                      class="character-nav"
+                      aria-label="后一组点阵"
+                      data-keep-focus
+                    >
+                      ›
+                    </button>
+                  </div>
                 </div>
                 <div class="reading-actions">
                   <button
@@ -301,15 +366,17 @@
                     data-keep-focus
                   >
                     <span data-icon="play"></span
-                    ><span class="button-label">播放阅读过程</span></button
-                  ><button class="button quiet" id="read-step" data-keep-focus>
-                    下一步 →</button
-                  ><button class="button quiet" id="read-reset" data-keep-focus>
+                    ><span class="button-label">播放顺序</span>
+                  </button>
+                  <button class="button quiet" id="read-step" data-keep-focus>
+                    下一步 →
+                  </button>
+                  <button class="button quiet" id="read-reset" data-keep-focus>
                     重置
                   </button>
                 </div>
                 <p id="reading-status" class="small-note" role="status">
-                  点击播放，或逐步查看每个位置。
+                  按图中的 1–8 读取。
                 </p>
               </div>
               <div class="lesson">
@@ -319,62 +386,12 @@
                 <svg
                   id="reading-svg"
                   role="img"
-                  aria-label="选中码元的两个字节和阅读顺序"
+                  aria-label="选中文字的点阵和阅读顺序"
                 ></svg>
-                <p class="small-note">
-                  数字是阅读顺序；实心表示 1，空心表示 0。
-                </p>
+                <p class="small-note">按 1–8 读取；实心是 1，空心是 0。</p>
                 <label class="check-label"
-                  ><input
-                    id="grid"
-                    type="checkbox"
-                  />在预览中显示辅助网格</label
+                  ><input id="grid" type="checkbox" />显示辅助网格</label
                 >
-              </div>
-            </div>
-          </details>
-          <details id="settings">
-            <summary>
-              <span class="summary-leading"
-                >编码格式<span id="settings-caption" class="sr-only"
-                  >魔法数字 · 默认</span
-                ></span
-              ><span class="plus" aria-hidden="true">+</span>
-            </summary>
-            <div class="details-content settings-content">
-              <div>
-                <label class="field-label" for="format-select">编码规则</label
-                ><select id="format-select">
-                  <option value="remap">魔法数字（默认）</option>
-                  <option value="native">Unicode 原生映射（历史兼容）</option>
-                </select>
-                <p class="small-note">
-                  旧编码还原不正确时，可尝试历史兼容格式。两种格式无法自动识别；仅选择规则不会改动内容。
-                </p>
-                <p id="source-note" class="small-note"></p>
-              </div>
-              <div class="format-actions">
-                <div class="format-action">
-                  <div>
-                    <strong>从原文重新生成</strong>
-                    <p>保留文字，更新盲文编码。</p>
-                  </div>
-                  <button class="button secondary" id="format-encode">
-                    重新编码 <span aria-hidden="true">↗</span>
-                  </button>
-                </div>
-                <div class="format-action">
-                  <div>
-                    <strong>用另一种规则还原</strong>
-                    <p>保留编码，重新读取原文。</p>
-                  </div>
-                  <button class="button secondary" id="format-decode">
-                    重新解释 <span aria-hidden="true">↙</span>
-                  </button>
-                </div>
-                <p class="small-note">
-                  应用后可以撤销。点阵与黑白格的显示方式不受影响。
-                </p>
               </div>
             </div>
           </details>
@@ -384,39 +401,43 @@
               ><span class="plus" aria-hidden="true">+</span>
             </summary>
             <div class="details-content principle-content">
-              <div class="principle-copy">
-                <p>
-                  每个 UTF-16 码元拆成高字节和低字节，转为 8 位二进制后，用
-                  <code>73654210</code> 重排，加上
-                  <code>10240</code>，得到两个盲文字符。解码用
-                  <code>76514320</code> 逆向还原。
-                </p>
-                <p>
-                  空白盲文 <code>U+2800</code> 也是数据；空格、换行、emoji
-                  和组合序列原样保留。这里是一种文字编码实验，不是自然语言的盲文翻译，也不是加密。
-                </p>
-                <p>
-                  黑白格中
-                  <strong>1 始终是黑色，0 始终是白色</strong
-                  >。换行、间距、网格和教学数字都只存在于展示层，复制的是完整
-                  Unicode 编码。
-                </p>
-                <p>
-                  文字只留在当前页面的内存中。只保存主题、格式和显示偏好；刷新会清空文字。页面不使用分析服务或第三方字体。
-                </p>
+              <div class="principle-flow" aria-label="编码过程">
+                <span>文字</span><span aria-hidden="true">→</span
+                ><span>二进制</span><span aria-hidden="true">→</span
+                ><span>点阵</span>
               </div>
-              <div class="source-block">
-                <div class="source-heading">
-                  <span>src/core.js · 实际运行的核心</span
-                  ><a
-                    href="https://github.com/eoiles/eoiles.github.io"
-                    target="_blank"
-                    rel="noreferrer"
-                    >GitHub ↗</a
-                  >
+              <p id="principle-description" class="small-note">
+                自然顺序把每个字节从左列向下放入点阵，再继续右列。解码时按相同顺序取回。
+              </p>
+              <p class="small-note">
+                空白点阵也是数据。空格、换行和 emoji 都原样保留。
+              </p>
+              <details id="source-details" class="source-disclosure">
+                <summary>
+                  <span>查看核心源码</span
+                  ><span class="plus" aria-hidden="true">+</span>
+                </summary>
+                <div class="details-content source-content">
+                  <div class="source-heading">
+                    <span id="source-title">自然顺序 · src/core.js</span
+                    ><a
+                      id="source-link"
+                      href="https://github.com/eoiles/eoiles.github.io/blob/master/src/core.js"
+                      target="_blank"
+                      rel="noreferrer"
+                      >GitHub ↗</a
+                    >
+                  </div>
+                  <pre
+                    id="core-source"
+                    tabindex="0"
+                    aria-label="当前编码方式的 JavaScript 源码"
+                  ></pre>
+                  <p class="source-note">
+                    按 UTF-16 码元处理；这是一种可逆编码，不是自然语言盲文翻译。
+                  </p>
                 </div>
-                <pre id="core-source" tabindex="0"></pre>
-              </div>
+              </details>
             </div>
           </details>
         </section>

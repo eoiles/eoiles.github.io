@@ -315,7 +315,7 @@ details .plus {
     transform 280ms var(--ease),
     color 180ms;
 }
-details[data-expanded="true"] .plus {
+details[data-expanded="true"] > summary .plus {
   transform: rotate(45deg);
 }
 details,

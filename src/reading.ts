@@ -70,7 +70,7 @@ export function characterLabel(value: string) {
 // 展示固定的 Python 概念示例；用文本节点着色，不插入用户 HTML。
 export function highlightPython(target: HTMLElement, source: string) {
   const tokens =
-    /(?<string>f?"(?:\\.|[^"\\])*")|(?<number>\b\d+\b)|(?<call>\b(?:ord|chr|int|replace)(?=\())/g;
+    /(?<string>f?"(?:\\.|[^"\\])*")|(?<keyword>\b(?:def|return|for|in)\b)|(?<number>\b\d+\b)|(?<call>(?:\b(?:ord|chr|int|join)|重排)(?=\())/g;
   const fragment = document.createDocumentFragment();
   let cursor = 0;
   for (const match of source.matchAll(tokens)) {

@@ -409,12 +409,57 @@
               <p id="principle-description" class="small-note">
                 每 8 个点排成两列，先向下，再向右；照此顺序读回文字。
               </p>
-              <div class="concept-example">
-                <p class="concept-heading">Python 示意</p>
-                <pre
-                  id="concept-code"
-                  aria-label="用 Python 展示转换概念"
-                ></pre>
+              <p class="small-note concept-context">
+                以 A 的低字节 65 为例，展示编码和还原。
+              </p>
+              <div class="concept-layout">
+                <div class="concept-example">
+                  <div class="concept-heading">
+                    <span id="concept-heading">自然顺序 · Python 示例</span
+                    ><code id="concept-result"></code>
+                  </div>
+                  <pre
+                    id="concept-code"
+                    aria-label="当前模式的 Python 编码和还原示例"
+                  ></pre>
+                </div>
+                <div class="concept-reference">
+                  <table
+                    class="concept-numbers"
+                    aria-label="两种编码方式使用的数字"
+                  >
+                    <thead>
+                      <tr>
+                        <th scope="col">用途</th>
+                        <th scope="col">自然顺序</th>
+                        <th scope="col">Unicode 原生</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">编码排列</th>
+                        <td><code>73654210</code></td>
+                        <td>不重排</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">还原排列</th>
+                        <td><code>76514320</code></td>
+                        <td>不重排</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">盲文起点</th>
+                        <td colspan="2"><code>10240</code> · U+2800</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">字节</th>
+                        <td colspan="2">8 位二进制；高 × 256 + 低</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p class="small-note concept-index">
+                    二进制从高位到低位写，排列位置从 0 开始计数。
+                  </p>
+                </div>
               </div>
             </div>
           </details>

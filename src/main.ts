@@ -11,6 +11,7 @@ import {
 } from "./motion";
 import { enc, tobin } from "./core.js";
 import pythonConcept from "./concept.py?raw";
+import nativeConcept from "./concept-native.py?raw";
 import {
   formatNames,
   readingOrder,
@@ -476,8 +477,12 @@ for (const format of ["remap", "native"] as const)
 
 function updatePrinciple() {
   if (principleFormat === state.format) return;
-  if (principleFormat === null)
-    highlightPython($("concept-code"), pythonConcept);
+  highlightPython(
+    $("concept-code"),
+    state.format === "remap" ? pythonConcept : nativeConcept,
+  );
+  text("concept-heading", `${formatNames[state.format]} · Python 示例`);
+  text("concept-result", `65 → ${encode("A", state.format)[1]} → 65`);
   principleFormat = state.format;
   text(
     "principle-description",

@@ -15,6 +15,7 @@ npm run dev
 
 ```sh
 npm test                  # 40 项协议测试，无需浏览器
+python tests/concept.test.py # 可选：用 Python 3 核对两份展示示例的全部字节
 npm run build             # 类型检查 + 品牌图标生成 + 静态构建
 npm run preview           # 预览 dist，默认 http://127.0.0.1:4173
 npx playwright install chromium webkit
@@ -32,7 +33,7 @@ npm run test:e2e           # 桌面 Chromium、移动 Chromium、iPhone 视口 W
 - 错误时保留当前编码、上次有效原文及预览，指出第几个 UTF-16 位置出错；修正后自动继续。
 - 「编码方式」默认收起，提供「自然顺序」和「Unicode 原生」。点击立即生效：最近编辑原文则保留原文重新编码，最近编辑编码则保留编码重新解释；说明就地标明保留哪一侧，可以撤销。两种协议范围相同，不能自动识别，需要手动选择。
 - 「怎么读」默认收起。没有输入时可试读 A / 中 / 😀，不写入编辑区；有内容时直接选字或用前后按钮浏览。emoji、组合字符和 ZWJ 序列保持为一个可见选项，必要时分组查看。自然顺序向下再向右；Unicode 原生按真实位权从高位读到低位，编号、箭头与二进制高亮一起更新。播放必须主动触发。
-- 「转换原理」只展示简短流程和 5 行 Python 概念示意，以 A 展示文字、二进制、实空点和还原。完整实现保留在仓库，页面不展示提交编号、实现文件路径或大段源码。
+- 「转换原理」只展示简短流程和 随模式切换的短 Python 编码/还原示例，以 A 的低字节 65 展示真实排列；并列列出两种模式的排列数字、盲文偏移和字节合并规则。完整实现保留在仓库，页面不展示提交编号、实现文件路径或大段源码。
 
 ## 隐私与边界
 
@@ -69,7 +70,7 @@ npm run test:e2e           # 桌面 Chromium、移动 Chromium、iPhone 视口 W
 
 | 文件 | 职责 |
 | --- | --- |
-| `src/concept.py` | 仅供页面展示的 5 行 Python 概念示意，不参与浏览器转换 |
+| `src/concept.py` / `src/concept-native.py` | 两种模式的单字节 Python 编码与还原示例，不参与浏览器转换 |
 | `src/core.js` | 可独立阅读的 remap 核心；没有 DOM、校验或依赖 |
 | `src/protocol.js` | 原生兼容格式、输入验证、真实 Unicode 点位、主动空白清理 |
 | `src/conversion.ts` / `src/worker.ts` | 转换调度数据与字素统计 |

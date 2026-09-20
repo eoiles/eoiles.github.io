@@ -222,7 +222,7 @@ test("rapid format changes on long text reject outdated work and keep small pick
   ).toBeLessThanOrEqual(5);
 });
 
-test("principle shows a short Python concept with highlighting and no overflow", async ({
+test("principle shows distinct Python algorithms and actual protocol numbers", async ({
   page,
 }) => {
   test.setTimeout(60000);
@@ -232,11 +232,10 @@ test("principle shows a short Python concept with highlighting and no overflow",
     "utf8",
   );
   expect(await page.locator("#concept-code").textContent()).toBe(source);
-  expect(source.trim().split("\n")).toHaveLength(5);
+  expect(source.trim().split("\n")).toHaveLength(7);
   await expect(page.locator("#concept-code .syntax-string")).toContainText([
-    '"A"',
-    '"●"',
-    '"○"',
+    '"73654210"',
+    '"76514320"',
   ]);
   await expect(page.locator("#principle")).not.toContainText("src/core.js");
   await expect(page.locator("#principle")).not.toContainText("287f510");
@@ -264,8 +263,26 @@ test("principle shows a short Python concept with highlighting and no overflow",
       expect(new Set(styles.colors).size).toBeGreaterThanOrEqual(3);
     }
   }
+  await expect(page.locator("#concept-result")).toHaveText("65 → ⢂ → 65");
+  await expect(page.locator(".concept-numbers")).toContainText("73654210");
+  await expect(page.locator(".concept-numbers")).toContainText("76514320");
+  await expect(page.locator(".concept-numbers")).toContainText("10240");
+  await expect(page.locator(".concept-numbers")).toContainText("256");
   await page.locator("#format-native").click();
+  const native = await fs.readFile(
+    new URL("../src/concept-native.py", import.meta.url),
+    "utf8",
+  );
+  expect(await page.locator("#concept-code").textContent()).toBe(native);
+  await expect(page.locator("#concept-code")).not.toContainText("重排");
+  await expect(page.locator("#concept-code")).toContainText("10240");
+  await expect(page.locator("#concept-heading")).toHaveText(
+    "Unicode 原生 · Python 示例",
+  );
+  await expect(page.locator("#concept-result")).toHaveText("65 → ⡁ → 65");
+  await page.locator("#format-remap").click();
   expect(await page.locator("#concept-code").textContent()).toBe(source);
+  await page.locator("#format-native").click();
   await expect(page.locator("#principle-description")).toContainText(
     "Unicode 点位",
   );
@@ -301,20 +318,18 @@ test("capture reading revision", async ({ page }, info) => {
 
 test("capture compact Python concept", async ({ page }, info) => {
   test.skip(!process.env.EOILES_CAPTURE, "Opt-in concept screenshot");
-  await page.locator("#theme").selectOption("dark");
+  await page.locator("#settings summary").click();
   await page.locator("#principle > summary").click();
-  await expect(page.locator("#concept-code")).toBeVisible();
-  await page
-    .locator("#principle")
-    .screenshot({
-      path: `${process.env.EOILES_CAPTURE}/${info.project.name}-concept-dark.png`,
-      animations: "disabled",
-    });
-  await page.locator("#theme").selectOption("light");
-  await page
-    .locator("#principle")
-    .screenshot({
-      path: `${process.env.EOILES_CAPTURE}/${info.project.name}-concept-light.png`,
-      animations: "disabled",
-    });
+  for (const format of ["remap", "native"]) {
+    await page.locator(`#format-${format}`).click();
+    for (const theme of ["dark", "light"]) {
+      await page.locator("#theme").selectOption(theme);
+      await page
+        .locator("#principle")
+        .screenshot({
+          path: `${process.env.EOILES_CAPTURE}/${info.project.name}-${format}-${theme}.png`,
+          animations: "disabled",
+        });
+    }
+  }
 });

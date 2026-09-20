@@ -233,15 +233,26 @@
 #principle-description {
   max-width: 700px;
 }
+.concept-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-top: 16px;
+}
 .concept-example {
   border: 1px solid var(--line);
   border-radius: 8px;
-  margin-top: 16px;
+  margin-top: 0;
   padding: 16px 20px;
   background: var(--panel);
   max-width: 620px;
 }
 .concept-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
   margin: 0 0 10px;
   font-size: 11px;
   color: var(--muted);
@@ -257,17 +268,20 @@
   color: var(--ink);
 }
 :root {
+  --syntax-keyword: #c9aff5;
   --syntax-string: #abdca9;
   --syntax-number: #e7c68e;
   --syntax-call: #a7ceef;
 }
 :root[data-theme="light"] {
+  --syntax-keyword: #75509e;
   --syntax-string: #326e41;
   --syntax-number: #846317;
   --syntax-call: #28658e;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
+    --syntax-keyword: #75509e;
     --syntax-string: #326e41;
     --syntax-number: #846317;
     --syntax-call: #28658e;
@@ -343,5 +357,56 @@
   }
   #concept-code {
     font-size: 12px;
+  }
+}
+
+.syntax-keyword {
+  color: var(--syntax-keyword);
+}
+#concept-result {
+  color: var(--accent);
+  white-space: pre;
+}
+.concept-numbers {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.concept-numbers th,
+.concept-numbers td {
+  text-align: left;
+  padding: 11px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.concept-numbers th {
+  font-weight: 400;
+  color: var(--muted);
+}
+.concept-numbers code {
+  color: var(--accent);
+  font-size: 12px;
+}
+.concept-index {
+  font-size: 11px;
+  margin: 12px 0 0;
+}
+.concept-context {
+  margin-bottom: 0;
+}
+@media (max-width: 800px) {
+  .concept-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .concept-example {
+    max-width: none;
+  }
+  .concept-numbers {
+    font-size: 11px;
+  }
+  .concept-numbers th,
+  .concept-numbers td {
+    padding: 10px 5px;
   }
 }

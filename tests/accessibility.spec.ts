@@ -12,7 +12,6 @@ test("WCAG AA: populated preview, error and expanded help in both themes", async
     await page.locator("#reading summary").click();
     await page.locator("#settings summary").click();
     await page.locator("#principle > summary").click();
-    await page.locator("#source-details > summary").click();
     await page
       .locator(theme === "dark" ? "#format-native" : "#format-remap")
       .click();
@@ -31,7 +30,6 @@ test("WCAG AA: populated preview, error and expanded help in both themes", async
         })),
       })),
     ).toEqual([]);
-    await page.locator("#source-details > summary").click();
     await page.locator("#reading summary").click();
     await page.locator("#settings summary").click();
     await page.locator("#principle > summary").click();

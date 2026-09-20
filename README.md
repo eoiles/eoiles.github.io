@@ -32,7 +32,7 @@ npm run test:e2e           # 桌面 Chromium、移动 Chromium、iPhone 视口 W
 - 错误时保留当前编码、上次有效原文及预览，指出第几个 UTF-16 位置出错；修正后自动继续。
 - 「编码方式」默认收起，提供「自然顺序」和「Unicode 原生」。点击立即生效：最近编辑原文则保留原文重新编码，最近编辑编码则保留编码重新解释；说明就地标明保留哪一侧，可以撤销。两种协议范围相同，不能自动识别，需要手动选择。
 - 「怎么读」默认收起。没有输入时可试读 A / 中 / 😀，不写入编辑区；有内容时直接选字或用前后按钮浏览。emoji、组合字符和 ZWJ 序列保持为一个可见选项，必要时分组查看。自然顺序向下再向右；Unicode 原生按真实位权从高位读到低位，编号、箭头与二进制高亮一起更新。播放必须主动触发。
-- 「原理与源码」先显示简短原理；实际核心源码再折叠一层，提供本地语法着色和自动换行，随编码方式展示对应实现。技术名词仅放在这里和统计提示中。
+- 「转换原理」只展示简短流程和 5 行 Python 概念示意，以 A 展示文字、二进制、实空点和还原。完整实现保留在仓库，页面不展示提交编号、实现文件路径或大段源码。
 
 ## 隐私与边界
 
@@ -69,13 +69,14 @@ npm run test:e2e           # 桌面 Chromium、移动 Chromium、iPhone 视口 W
 
 | 文件 | 职责 |
 | --- | --- |
+| `src/concept.py` | 仅供页面展示的 5 行 Python 概念示意，不参与浏览器转换 |
 | `src/core.js` | 可独立阅读的 remap 核心；没有 DOM、校验或依赖 |
 | `src/protocol.js` | 原生兼容格式、输入验证、真实 Unicode 点位、主动空白清理 |
 | `src/conversion.ts` / `src/worker.ts` | 转换调度数据与字素统计 |
 | `src/text-model.ts` | 文本框与原始 CRLF 字符串之间的最小编辑协调 |
 | `src/render.ts` | 确定性的 SVG 坐标、完整画布、PNG 栅格化 |
 | `src/image-export.ts` / `src/export-worker.ts` | 大型导出后台处理与边界反馈 |
-| `src/reading.ts` / `src/reading.css` | 两种格式的阅读顺序、选字、源码着色与紧凑教学布局 |
+| `src/reading.ts` / `src/reading.css` | 两种格式的阅读顺序、选字、Python 示意着色与紧凑教学布局 |
 | `src/main.ts` | 双向编辑状态、撤销、偏好、焦点、反馈与主动教学 |
 | `src/style.css` / `src/workspace.css` | 基础控件、双主题与桌面/手机工作台布局 |
 | `src/motion.ts` / `src/motion.css` | 可中断的面板过渡、交互反馈、光感与减少动态偏好 |

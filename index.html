@@ -397,7 +397,7 @@
           </details>
           <details id="principle">
             <summary>
-              <span class="summary-leading">原理与源码</span
+              <span class="summary-leading">转换原理</span
               ><span class="plus" aria-hidden="true">+</span>
             </summary>
             <div class="details-content principle-content">
@@ -407,37 +407,15 @@
                 ><span>点阵</span>
               </div>
               <p id="principle-description" class="small-note">
-                自然顺序把每个字节从左列向下放入点阵，再继续右列。解码时按相同顺序取回。
+                每 8 个点排成两列，先向下，再向右；照此顺序读回文字。
               </p>
-              <p class="small-note">
-                空白点阵也是数据。空格、换行和 emoji 都原样保留。
-              </p>
-              <details id="source-details" class="source-disclosure">
-                <summary>
-                  <span>查看核心源码</span
-                  ><span class="plus" aria-hidden="true">+</span>
-                </summary>
-                <div class="details-content source-content">
-                  <div class="source-heading">
-                    <span id="source-title">自然顺序 · src/core.js</span
-                    ><a
-                      id="source-link"
-                      href="https://github.com/eoiles/eoiles.github.io/blob/master/src/core.js"
-                      target="_blank"
-                      rel="noreferrer"
-                      >GitHub ↗</a
-                    >
-                  </div>
-                  <pre
-                    id="core-source"
-                    tabindex="0"
-                    aria-label="当前编码方式的 JavaScript 源码"
-                  ></pre>
-                  <p class="source-note">
-                    按 UTF-16 码元处理；这是一种可逆编码，不是自然语言盲文翻译。
-                  </p>
-                </div>
-              </details>
+              <div class="concept-example">
+                <p class="concept-heading">Python 示意</p>
+                <pre
+                  id="concept-code"
+                  aria-label="用 Python 展示转换概念"
+                ></pre>
+              </div>
             </div>
           </details>
         </section>

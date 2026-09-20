@@ -67,10 +67,10 @@ export function characterLabel(value: string) {
   );
 }
 
-// 只为随应用打包的源码着色，保留原始文本；不解析或插入用户输入为 HTML。
-export function highlightSource(target: HTMLElement, source: string) {
+// 展示固定的 Python 概念示例；用文本节点着色，不插入用户 HTML。
+export function highlightPython(target: HTMLElement, source: string) {
   const tokens =
-    /(?<comment>\/\/[^\n]*|\/\*[\s\S]*?\*\/)|(?<string>"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(?<keyword>\b(?:export|function|var|const|let|return|for|if|else|import|from)\b)|(?<number>\b(?:0x[\da-fA-F]+|\d+)\b)|(?<call>\b[A-Za-z_$][\w$]*(?=\s*\())/g;
+    /(?<string>f?"(?:\\.|[^"\\])*")|(?<number>\b\d+\b)|(?<call>\b(?:ord|chr|int|replace)(?=\())/g;
   const fragment = document.createDocumentFragment();
   let cursor = 0;
   for (const match of source.matchAll(tokens)) {

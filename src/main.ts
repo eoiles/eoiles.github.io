@@ -10,14 +10,13 @@ import {
   confirmStatus,
 } from "./motion";
 import { enc, tobin } from "./core.js";
-import coreSource from "./core.js?raw";
-import protocolSource from "./protocol.js?raw";
+import pythonConcept from "./concept.py?raw";
 import {
   formatNames,
   readingOrder,
   characterAt,
   characterLabel,
-  highlightSource,
+  highlightPython,
 } from "./reading";
 import "./reading.css";
 import { bits, encode, cleanWhitespace } from "./protocol.js";
@@ -121,7 +120,7 @@ let worker: Worker | null = null;
 const previewLimit = 256;
 const cellSize = 14; // 合适的默认尺寸，按完整码元自动换行。
 const feedbackTimers = new Map<string, number>();
-let sourceFormat: Format | null = null;
+let principleFormat: Format | null = null;
 let lessonOffset = 0,
   lessonPart = 0,
   exampleIndex = 0;
@@ -207,7 +206,7 @@ function refresh() {
     );
     button(`format-${format}`).disabled = !!composing;
   }
-  updateSource();
+  updatePrinciple();
   setStatus(
     statusMessage(),
     state.error ? "error" : pending ? "pending" : "valid",
@@ -475,23 +474,16 @@ for (const format of ["remap", "native"] as const)
     );
   };
 
-function updateSource() {
-  if (sourceFormat === state.format) return;
-  sourceFormat = state.format;
-  const natural = state.format === "remap";
-  const filename = natural ? "core.js" : "protocol.js";
-  const source = natural
-    ? coreSource
-    : protocolSource.split(/\r?\nexport function validate\(/)[0].trimEnd();
-  highlightSource($("core-source"), source);
-  text("source-title", `${formatNames[state.format]} · src/${filename}`);
-  $<HTMLAnchorElement>("source-link").href =
-    `https://github.com/eoiles/eoiles.github.io/blob/master/src/${filename}`;
+function updatePrinciple() {
+  if (principleFormat === state.format) return;
+  if (principleFormat === null)
+    highlightPython($("concept-code"), pythonConcept);
+  principleFormat = state.format;
   text(
     "principle-description",
-    natural
-      ? "自然顺序把二进制从左列向下放入点阵，再继续右列。解码时按相同顺序取回。"
-      : "Unicode 原生直接使用盲文点位的位权。读取时按图中的编号，从高位到低位取回二进制。",
+    state.format === "remap"
+      ? "每 8 个点排成两列，先向下，再向右；照此顺序读回文字。"
+      : "每 8 个点按 Unicode 点位排列。按图中编号读取，就能还原。",
   );
 }
 

@@ -222,23 +222,24 @@ test("rapid format changes on long text reject outdated work and keep small pick
   ).toBeLessThanOrEqual(5);
 });
 
-test("source is collapsed, highlighted exact implementation without nested scroll or overflow", async ({
+test("principle shows a short Python concept with highlighting and no overflow", async ({
   page,
 }) => {
   test.setTimeout(60000);
   await page.locator("#principle > summary").click();
-  await expect(page.locator("#source-details")).not.toHaveAttribute("open");
-  await page.locator("#source-details > summary").click();
   const source = await fs.readFile(
-    new URL("../src/core.js", import.meta.url),
+    new URL("../src/concept.py", import.meta.url),
     "utf8",
   );
-  expect(await page.locator("#core-source").textContent()).toBe(source);
-  await expect(page.locator("#core-source .syntax-string")).toContainText([
-    '""',
-    '"73654210"',
-    '"76514320"',
+  expect(await page.locator("#concept-code").textContent()).toBe(source);
+  expect(source.trim().split("\n")).toHaveLength(5);
+  await expect(page.locator("#concept-code .syntax-string")).toContainText([
+    '"A"',
+    '"●"',
+    '"○"',
   ]);
+  await expect(page.locator("#principle")).not.toContainText("src/core.js");
+  await expect(page.locator("#principle")).not.toContainText("287f510");
   await page.locator("#settings summary").click();
   await page.locator("#reading summary").click();
   for (const theme of ["dark", "light"]) {
@@ -252,7 +253,7 @@ test("source is collapsed, highlighted exact implementation without nested scrol
           ),
         )
         .toBe(true);
-      const styles = await page.locator("#core-source").evaluate((el) => ({
+      const styles = await page.locator("#concept-code").evaluate((el) => ({
         height: el.clientHeight,
         scroll: el.scrollHeight,
         colors: [...el.querySelectorAll("span")].map(
@@ -260,19 +261,13 @@ test("source is collapsed, highlighted exact implementation without nested scrol
         ),
       }));
       expect(styles.scroll - styles.height).toBeLessThanOrEqual(1);
-      expect(new Set(styles.colors).size).toBeGreaterThanOrEqual(4);
+      expect(new Set(styles.colors).size).toBeGreaterThanOrEqual(3);
     }
   }
   await page.locator("#format-native").click();
-  const native = await fs.readFile(
-    new URL("../src/protocol.js", import.meta.url),
-    "utf8",
-  );
-  expect(await page.locator("#core-source").textContent()).toBe(
-    native.split(/\r?\nexport function validate\(/)[0].trimEnd(),
-  );
-  await expect(page.locator("#source-title")).toHaveText(
-    "Unicode 原生 · src/protocol.js",
+  expect(await page.locator("#concept-code").textContent()).toBe(source);
+  await expect(page.locator("#principle-description")).toContainText(
+    "Unicode 点位",
   );
 });
 
@@ -296,11 +291,30 @@ test("capture reading revision", async ({ page }, info) => {
   }
   await page.locator("#format-remap").click();
   await page.locator("#principle > summary").click();
-  await page.locator("#source-details > summary").click();
   await page.evaluate(() => scrollTo(0, 0));
   await page.screenshot({
     path: `${process.env.EOILES_CAPTURE}/${info.project.name}-source.png`,
     fullPage: true,
     animations: "disabled",
   });
+});
+
+test("capture compact Python concept", async ({ page }, info) => {
+  test.skip(!process.env.EOILES_CAPTURE, "Opt-in concept screenshot");
+  await page.locator("#theme").selectOption("dark");
+  await page.locator("#principle > summary").click();
+  await expect(page.locator("#concept-code")).toBeVisible();
+  await page
+    .locator("#principle")
+    .screenshot({
+      path: `${process.env.EOILES_CAPTURE}/${info.project.name}-concept-dark.png`,
+      animations: "disabled",
+    });
+  await page.locator("#theme").selectOption("light");
+  await page
+    .locator("#principle")
+    .screenshot({
+      path: `${process.env.EOILES_CAPTURE}/${info.project.name}-concept-light.png`,
+      animations: "disabled",
+    });
 });

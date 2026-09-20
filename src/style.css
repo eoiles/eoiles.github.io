@@ -970,6 +970,12 @@ footer {
   }
 }
 @media (max-width: 640px) {
+  html {
+    scroll-padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+  .details-section summary {
+    scroll-margin-block: 80px;
+  }
   .shell {
     padding: 0 20px;
   }

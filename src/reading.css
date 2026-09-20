@@ -233,66 +233,45 @@
 #principle-description {
   max-width: 700px;
 }
-.source-disclosure {
+.concept-example {
   border: 1px solid var(--line);
   border-radius: 8px;
-  margin-top: 20px;
+  margin-top: 16px;
+  padding: 16px 20px;
   background: var(--panel);
+  max-width: 620px;
 }
-.source-disclosure > summary {
-  padding: 0 18px;
-  min-height: 48px;
-  font-size: 12px;
-}
-.source-disclosure .source-content {
-  padding: 2px 18px 16px;
-}
-.source-heading {
+.concept-heading {
+  margin: 0 0 10px;
   font-size: 11px;
-  padding: 10px 0;
+  color: var(--muted);
 }
-#core-source {
-  font-family: ui-monospace, Consolas, monospace;
+#concept-code {
+  margin: 0;
+  font:
+    13px/2 ui-monospace,
+    Consolas,
+    monospace;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  max-height: none;
-  overflow-x: hidden;
-  font-size: 12px;
-  line-height: 1.9;
   color: var(--ink);
-  margin: 12px 0;
-}
-.source-note {
-  color: var(--faint);
-  font-size: 11px;
-  line-height: 1.8;
-  margin-bottom: 0;
 }
 :root {
-  --syntax-keyword: #c9aff5;
   --syntax-string: #abdca9;
   --syntax-number: #e7c68e;
   --syntax-call: #a7ceef;
-  --syntax-comment: #96a29f;
 }
 :root[data-theme="light"] {
-  --syntax-keyword: #75509e;
   --syntax-string: #326e41;
   --syntax-number: #846317;
   --syntax-call: #28658e;
-  --syntax-comment: #63706b;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --syntax-keyword: #75509e;
     --syntax-string: #326e41;
     --syntax-number: #846317;
     --syntax-call: #28658e;
-    --syntax-comment: #63706b;
   }
-}
-.syntax-keyword {
-  color: var(--syntax-keyword);
 }
 .syntax-string {
   color: var(--syntax-string);
@@ -302,9 +281,6 @@
 }
 .syntax-call {
   color: var(--syntax-call);
-}
-.syntax-comment {
-  color: var(--syntax-comment);
 }
 @media (max-width: 700px) {
   .format-options {
@@ -362,13 +338,10 @@
   #reading-status {
     min-height: 20px;
   }
-  .source-disclosure > summary {
-    padding: 0 12px;
+  .concept-example {
+    padding: 14px 12px;
   }
-  .source-disclosure .source-content {
-    padding: 0 12px 12px;
-  }
-  #core-source {
-    font-size: 11px;
+  #concept-code {
+    font-size: 12px;
   }
 }

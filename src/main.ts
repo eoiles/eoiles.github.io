@@ -1,6 +1,7 @@
 import "./style.css";
 import "./workspace.css";
 import "./motion.css";
+import "./portal.css";
 import {
   initMotion,
   setVisible,
@@ -51,6 +52,14 @@ const show = (id: string, visible: boolean) => {
   setVisible($(id), visible);
 };
 const storageKey = "eoiles.preferences";
+const setSurface = (surface: "portal" | "eoiles") => {
+  document.body.dataset.surface = surface;
+  document.title =
+    surface === "portal"
+      ? "eoiles / NEUMA — 本地小工具"
+      : "eoiles — 文字的另一种形状";
+  window.scrollTo({ top: 0, behavior: "instant" });
+};
 type Preferences = {
   theme: "system" | "light" | "dark";
   format: Format;
@@ -1049,5 +1058,8 @@ applyView();
 refresh();
 updateLesson();
 viewportChanged();
+
+button("launch-eoiles").addEventListener("click", () => setSurface("eoiles"));
+button("return-portal").addEventListener("click", () => setSurface("portal"));
 
 initMotion();

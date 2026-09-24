@@ -12,7 +12,7 @@
       content="让文字有另一种形状。eoiles，在浏览器本地将文字转换为 Unicode 盲文点阵，切换黑白格，复制、还原与导出。"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>eoiles — 文字的另一种形状</title>
+    <title>eoiles / NEUMA — 本地小工具</title>
     <script>
       try {
         var p = JSON.parse(localStorage.getItem("eoiles.preferences") || "{}");
@@ -24,13 +24,44 @@
       } catch {}
     </script>
   </head>
-  <body>
+  <body data-surface="portal">
+    <section id="portal" class="portal" aria-labelledby="portal-title">
+      <div class="portal-shell">
+        <header class="portal-header">
+          <div class="portal-wordmark" aria-label="eoiles">
+            <span class="portal-mark" aria-hidden="true"></span>
+            <span>eoiles<span class="brand-period">.</span></span>
+          </div>
+          <span class="portal-edition">LOCAL TOOLS / 02</span>
+        </header>
+        <main class="portal-main">
+          <p class="portal-kicker">A QUIET PLACE FOR SMALL SYSTEMS</p>
+          <h1 id="portal-title">选择今天想打开的<br /><span>一件小工具。</span></h1>
+          <p class="portal-intro">文字可以成为点阵，界面也可以有触感。两者都只在你的浏览器里运行。</p>
+          <div class="portal-choices">
+            <button id="launch-eoiles" class="portal-choice portal-choice-eoiles" type="button">
+              <span class="portal-card-head"><span>01</span><span>文字 / 点阵</span></span>
+              <span class="portal-braille" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="portal-choice-copy"><strong>eoiles</strong><small>把文字转换为 Unicode 点阵</small></span>
+              <span class="portal-go" aria-hidden="true">打开&nbsp; ↗</span>
+            </button>
+            <a class="portal-choice portal-choice-neuma" href="/neuma/index.html" aria-label="打开 NEUMA Phone">
+              <span class="portal-card-head"><span>02</span><span>触感 / 日常</span></span>
+              <span class="portal-phone" aria-hidden="true"><span class="portal-phone-bar"></span><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="portal-choice-copy"><strong>NEUMA Phone</strong><small>一台柔和的拟态手机</small></span>
+              <span class="portal-go" aria-hidden="true">打开&nbsp; ↗</span>
+            </a>
+          </div>
+        </main>
+        <footer class="portal-footer"><span>EOILES / NEUMA</span><span>本地运行 · 不上传内容</span></footer>
+      </div>
+    </section>
     <a class="skip-link" href="#raw">跳到文字输入</a>
     <div class="shell">
       <header class="site-header">
-        <a href="/" class="wordmark" aria-label="eoiles 首页"
+        <button id="return-portal" class="wordmark" type="button" aria-label="返回工具选择"
           ><svg id="logo-mark" aria-hidden="true"></svg
-          ><span>eoiles<span class="brand-period">.</span></span></a
+          ><span>eoiles<span class="brand-period">.</span></span></button
         >
         <div class="header-end">
           <span id="brand-code" class="brand-code" aria-hidden="true"></span
